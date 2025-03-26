@@ -1,0 +1,55 @@
+@startuml
+hide circle
+
+entity Games {
+  * id: SERIAL [PK]
+  --
+  title: VARCHAR
+  description: TEXT
+  developer: VARCHAR
+  publisher: VARCHAR
+  release_date: DATE
+  last_modified: TIMESTAMP
+}
+
+entity Users {
+  * id: SERIAL [PK]
+  --
+  username: VARCHAR UNIQUE
+  hashed_password: TEXT
+  email: VARCHAR UNIQUE
+  role: ENUM("admin", "user")
+  last_modified: TIMESTAMP
+  created_at: TIMESTAMP
+}
+
+entity UserReviews {
+  * id: SERIAL [PK]
+  --
+  game_id: INT [FK -> Games.id]
+  user_id: INT [FK -> Users.id]
+  rating: INT
+  text: TEXT
+  created_at: TIMESTAMP
+  last_modified: TIMESTAMP
+  platform: VARCHAR
+}
+
+entity CriticReviews {
+  * id: SERIAL [PK]
+  --
+  game_id: INT [FK -> Games.id]
+  publication: VARCHAR
+  rating: INT
+  text: TEXT
+  full_review_link: VARCHAR
+  created_at: TIMESTAMP
+}
+
+
+Users ||--o{ UserReviews
+Games ||--o{ UserReviews
+Games ||--o{ CriticReviews
+
+
+@enduml
