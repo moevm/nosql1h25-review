@@ -1,0 +1,90 @@
+@startuml
+hide circle
+skinparam linetype ortho
+
+entity Games {
+  * _id: ObjectId
+  --
+  title: string
+  description: string
+  developer: string
+  publisher: string
+  platforms: array<string>
+  releaseDate: date
+  lastModified: datetime
+
+  stats.userReviews.total: int
+  stats.userReviews.avgRating: float
+
+  stats.criticReviews.total: int
+  stats.criticReviews.avgRating: float
+
+  recentUserReviews: array<object>
+  recentCriticReviews: array<object>
+}
+
+entity Users {
+  * _id: ObjectId
+  --
+  username: string
+  hashedPassword: string
+  email: string
+  role: enum("admin", "user")
+
+  lastModified: datetime
+  createdAt: datetime
+}
+
+entity UserReviews {
+  * _id: ObjectId
+  --
+  gameId: ObjectId
+  userId: ObjectId
+
+  gameTitle: string
+  rating: int
+  text: string
+  platform: string
+
+  createdAt: datetime
+  lastModified: da
+}
+
+entity CriticReviews {
+  * _id: ObjectId
+  --
+  gameId: ObjectId
+
+  publication: string
+  gameTitle: string
+  rating: int
+  text: string
+  fullReviewLink: string
+  platforms: array<string>
+
+  createdAt: datetime
+}
+
+Games ||--o{ UserReviews
+Games ||--o{ CriticReviews
+Users ||--o{ UserReviews
+
+note right of Games::stats.userReviews.avgRating
+    One decimal place
+end note
+
+note right of Games::stats.criticReviews.avgRating
+    One decimal place
+end note
+
+note right of Games::recentUserReviews
+  Last 3 UserReviews
+end note
+
+note right of Games::recentCriticReviews
+  Last 3 CriticReviews
+end note
+
+
+
+@enduml
