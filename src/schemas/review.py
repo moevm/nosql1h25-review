@@ -8,20 +8,25 @@ class UserReview(TypedDict):
     _id: ObjectId
     gameId: ObjectId
     userId: ObjectId
+
     gameTitle: str
     rating: int
     text: str
-    timestamp: datetime
     platform: str
+
+    createdAt: datetime
+    lastModified: datetime
 
 
 class CriticReview(TypedDict):
     _id: ObjectId
     gameId: ObjectId
+
     publication: str
     gameTitle: str
     rating: int
     text: str
     fullReviewLink: str
-    timestamp: datetime
     platforms: list[str]
+
+    createdAt: datetime

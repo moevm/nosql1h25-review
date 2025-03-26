@@ -24,7 +24,9 @@ class Game(TypedDict):
     publisher: str
     platforms: list[str]
     releaseDate: datetime
-    lastModified: datetime
+
     stats: Stats
     recentUserReviews: list[UserReview]
     recentCriticReviews: list[CriticReview]
+
+    lastModified: datetime

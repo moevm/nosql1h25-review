@@ -8,7 +8,9 @@ from bson import ObjectId
 class User(TypedDict):
     _id: ObjectId
     username: str
-    hashed_password: str
+    hashedPassword: str
     email: str
     role: Literal["user", "admin"]
+
+    createdAt: datetime
     lastModified: datetime
