@@ -27,10 +27,12 @@ entity Users {
   * _id: ObjectId
   --
   username: string
-  hashed_password: string
+  hashedPassword: string
   email: string
   role: enum("admin", "user")
+
   lastModified: datetime
+  createdAt: datetime
 }
 
 entity UserReviews {
@@ -38,24 +40,29 @@ entity UserReviews {
   --
   gameId: ObjectId
   userId: ObjectId
+
   gameTitle: string
   rating: int
   text: string
-  timestamp: datetime
   platform: string
+
+  createdAt: datetime
+  lastModified: da
 }
 
 entity CriticReviews {
   * _id: ObjectId
   --
   gameId: ObjectId
+
   publication: string
   gameTitle: string
   rating: int
   text: string
   fullReviewLink: string
-  timestamp: datetime
   platforms: array<string>
+
+  createdAt: datetime
 }
 
 Games ||--o{ UserReviews
