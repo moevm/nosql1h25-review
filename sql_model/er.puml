@@ -6,6 +6,7 @@ entity Games {
   --
   title: VARCHAR
   description: TEXT
+  image_ref: TEXT
   developer: VARCHAR
   publisher: VARCHAR
   release_date: DATE
