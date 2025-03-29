@@ -24,6 +24,8 @@ class Game(TypedDict):
     publisher: str
     platforms: list[str]
     releaseDate: datetime
+    genres: list[str]
+    imageUrl: str
 
     stats: Stats
     recentUserReviews: list[UserReview]
