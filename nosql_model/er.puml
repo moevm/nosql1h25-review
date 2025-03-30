@@ -12,6 +12,8 @@ entity Games {
   platforms: array<string>
   releaseDate: date
   lastModified: datetime
+  imageUrl: string
+  genres: array<string>
 
   stats.userReviews.total: int
   stats.userReviews.avgRating: float
