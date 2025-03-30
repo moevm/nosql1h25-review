@@ -9,8 +9,10 @@ entity Games {
   image_ref: TEXT
   developer: VARCHAR
   publisher: VARCHAR
+  platforms: LIST<VARCHAR>
   release_date: DATE
   last_modified: TIMESTAMP
+  genres: LIST<VARCHAR>
 }
 
 entity Users {
@@ -45,6 +47,7 @@ entity CriticReviews {
   text: TEXT
   full_review_link: VARCHAR
   created_at: TIMESTAMP
+  platforms: LIST<VARCHAR>
 }
 
 
