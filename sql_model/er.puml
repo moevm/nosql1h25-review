@@ -46,6 +46,7 @@ entity CriticReviews {
   text: TEXT
   full_review_link: VARCHAR
   created_at: TIMESTAMP
+  platforms: LIST<VARCHAR>
 }
 
 
