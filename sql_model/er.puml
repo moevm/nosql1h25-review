@@ -9,6 +9,7 @@ entity Games {
   image_ref: TEXT
   developer: VARCHAR
   publisher: VARCHAR
+  platforms: LIST<VARCHAR>
   release_date: DATE
   last_modified: TIMESTAMP
 }
