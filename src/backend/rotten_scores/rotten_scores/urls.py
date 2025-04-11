@@ -5,10 +5,10 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
-    path('users/', include('users.urls')),
+    path('profile/', include('user_profile.urls')),
+    path('profile/admin_panel', include('admin_panel.urls')),
     path('games/', include('games.urls')),
     path('reviews/', include('reviews.urls')),
-    path('adminpanel/', include('admin_panel.urls')),
 ]
 
 auth_urls = ([
