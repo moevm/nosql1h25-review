@@ -1,8 +1,9 @@
 from src.io.mongo_io_manager import MongoIOManager
 
+
 def main():
-    io_manager = MongoIOManager("rewagg", "backup")
-    io_manager.import_data(drop=True)
+    mongo_io_manager = MongoIOManager("rotten_scores", "backup")
+    mongo_io_manager.import_data()
 
 
 if __name__ == '__main__':
