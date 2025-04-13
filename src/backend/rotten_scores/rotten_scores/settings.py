@@ -55,11 +55,14 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'rotten_scores.urls'
+# MongoDB настройки
+MONGODB_URI = 'mongodb://localhost:27017/'
+MONGODB_NAME = 'game_reviews_db'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],  
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -70,6 +73,9 @@ TEMPLATES = [
             ],
         },
     },
+]
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
 ]
 
 WSGI_APPLICATION = 'rotten_scores.wsgi.application'
