@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Project{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block extra_head %}{% endblock %}
+    <style>
+        body {
+            margin: 0;
+            font-family: sans-serif;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+
+    {% include 'header.html' %}
+
+    <main style="min-height: 70vh; padding: 2rem;">
+        {% block content %}
+        <!-- Main content goes here -->
+        {% endblock %}
+    </main>
+
+    {% include 'footer.html' %}
+
+</body>
+</html>
