@@ -1,3 +1,9 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 
-# Create your views here.
+def my_reviews_and(request):
+    return HttpResponse("Заглушка")
+def account(request):
+    return HttpResponse("Заглушка")
+def statistics(request):
+    return HttpResponse("Заглушка")

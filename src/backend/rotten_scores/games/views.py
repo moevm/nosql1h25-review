@@ -1,3 +1,7 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 
-# Create your views here.
+def game_list(request):
+    return HttpResponse("Заглушка лист игр")
+def game_detail(request):
+    return HttpResponse("Заглушка детали игры")
