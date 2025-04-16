@@ -1,15 +1,17 @@
 <!-- header.html -->
+{% load static %}
+
 <header style="background-color: black; color: white; padding: 1rem;">
     <div style="display: flex; align-items: center; max-width: 1200px; margin: 0 auto;">
         <!-- Логотип и Games -->
         <div style="display: flex; align-items: center; flex-grow: 1;">
             <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 2rem; font-weight: bold; margin-right: 3rem;">
                 <img src="{% static 'img/logo.png' %}" alt="Logo" style="width: 32px; height: 32px;">
-                RottenScores
+                <a class="navbar-brand" href="{% url 'core:homepage' %}">RottenScores</a>
             </div>
             
             <nav style="margin-right: auto;">
-                <a href="#" style="color: #FFBD3F; text-decoration: none; font-size: 1.2rem; margin-right: 2rem;">Games</a>
+                <a href="{% url 'games:game_list' %}" style="color: #FFBD3F; text-decoration: none; font-size: 1.2rem; margin-right: 2rem;">Games</a>
             </nav>
         </div>
 

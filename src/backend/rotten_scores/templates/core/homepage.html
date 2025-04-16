@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Homepage | RottenScores{% endblock %}
+
+{% block content %}
+<section class="mb-5">
+    <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h2>New Releases</h2>
+        <a href="{% url 'games:game_list' %}" class="text-decoration-none">SEE ALL</a>
+    </div>
+
+    <div class="row">
+        {% for game in new_releases %}
+        <div class="col-md-3 mb-4">
+            <div class="card game-card">
+                {% if game.avg_rating_display %}
+                <div class="rating-badge {% if game.avg_rating_display >= 85 %}rating-high{% elif game.avg_rating_display >= 70 %}rating-medium{% else %}rating-low{% endif %}">
+                    {{ game.avg_rating_display }}
+                </div>
+                {% endif %}
+                <img src="{{ game.image_ref|default:'https://via.placeholder.com/300x450?text=No+Image' }}" class="card-img-top" alt="{{ game.title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ game.title }}</h5>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            {% if game.release_date %}
+                            {{ game.release_date|date:"d M Y" }}
+                            {% endif %}
+                        </small>
+                    </p>
+                    <div class="d-flex justify-content-between">
+                        <span class="badge {% if game.avg_rating_display >= 85 %}bg-success{% elif game.avg_rating_display >= 70 %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                            {% if game.avg_rating %}Mixed or Average{% else %}Not Rated{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">No new releases found.</div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section>
+    <div class="section-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+            <h2>Best Games on</h2>
+            <ul class="platform-nav mt-2" style="list-style: none; padding-left: 0; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                {% comment %} {% for platform_name in all_platforms %}
+                <li>
+                    <a href="?platform={{ platform_name }}" 
+                       class="{% if current_platform == platform_name %}active{% endif %}">
+                        {{ platform_name }}
+                    </a>
+                </li>
+                {% endfor %} {% endcomment %}
+                <div class="mb-4">
+                    <ul class="nav platform-nav">
+                        {% for platform_name in all_platforms %}
+                            <li class="nav-item me-2">
+                                <a href="?platform={{ platform_name }}"
+                                   class="nav-link {% if current_platform == platform_name %}active text-dark bg-dark text-white{% else %}text-muted{% endif %}"
+                                   style="padding: 0.5rem 1rem; border-radius: 0.5rem; transition: 0.3s;">
+                                    {{ platform_name }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                
+            </ul>
+        </div>
+        <a href="{% url 'games:game_list' %}" class="text-decoration-none">SEE ALL</a>
+    </div>
+
+    <div class="row">
+        {% for game in best_platform_games %}
+        <div class="col-md-4 mb-4">
+            <div class="card mb-3" style="max-width: 540px;">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="{{ game.image_ref|default:'https://via.placeholder.com/200x300?text=No+Image' }}" 
+                             class="img-fluid rounded-start" alt="{{ game.title }}">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ forloop.counter }}. {{ game.title }}</h5>
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge rounded-pill {% if game.avg_rating_display >= 85 %}bg-success{% elif game.avg_rating_display >= 70 %}bg-warning text-dark{% else %}bg-danger{% endif %} me-2">
+                                    {{ game.avg_rating_display|default:"?" }}
+                                </span>
+                                <small>Universal Acclaim</small>
+                            </div>
+                            <div class="d-flex flex-wrap">
+                                {% for platform in game.platforms %}
+                                <span class="badge bg-light text-dark me-1 mb-1">{{ platform }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="progress mt-3">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ game.avg_rating_display }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-info">No top games found for {{ current_platform }}.</div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
