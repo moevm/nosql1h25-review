@@ -104,7 +104,7 @@ class HomepageView(TemplateView):
 
 class LoginView(FormView):
     template_name = 'registration/login.html'
-    form_class = forms.UsernameAuthenticationForm
+    form_class = forms.LoginForm
 
     def get_success_url(self):
         # Возвращаем URL, с которого пришел пользователь, или домашнюю страницу

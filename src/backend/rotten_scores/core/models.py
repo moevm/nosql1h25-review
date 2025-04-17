@@ -1,21 +1,53 @@
-import mongoengine as me
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.db import models
 from django.utils import timezone
+from django.contrib.auth.hashers import make_password, check_password
 
 
-class User(me.Document):
-    username = me.StringField(max_length=150, unique=True, required=True)
-    email = me.EmailField(unique=True)
-    hashedPassword = me.StringField(required=True)
-    role = me.StringField(choices=["user", "admin"], default="user")
-    created_at = me.DateTimeField(default=timezone.now)
-    last_modified = me.DateTimeField(default=timezone.now)
+class CustomUserManager(BaseUserManager):
+    def create_user(self, username, email, password=None):
+        if not email:
+            raise ValueError("User must have an email address")
+        email = self.normalize_email(email)
+        user = self.model(username=username, email=email)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
-    meta = {
-        'indexes': [
-            'username',
-            'email',
-        ]
-    }
+    def create_superuser(self, username, email, password=None):
+        user = self.create_user(username, email, password)
+        user.is_admin = True
+        user.save(using=self._db)
+        return user
+
+
+class User(AbstractBaseUser):
+    username = models.CharField(max_length=150, unique=True)
+    email = models.EmailField(unique=True)
+    hashed_password = models.CharField(max_length=255)  # Храним хешированный пароль
+    role = models.CharField(choices=[("user", "User"), ("admin", "Admin")], default="user", max_length=20)
+    created_at = models.DateTimeField(default=timezone.now)
+    last_modified = models.DateTimeField(default=timezone.now)
+
+    # Дополнительные поля для аутентификации
+    is_active = models.BooleanField(default=True)
+    is_admin = models.BooleanField(default=False)
+
+    # Настройки для аутентификации
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
+
+    objects = CustomUserManager()
+
+    def check_password(self, raw_password):
+        # Проверка пароля
+        return check_password(raw_password, self.hashed_password)
+
+    def set_password(self, raw_password):
+        self.hashed_password = make_password(raw_password)  # Хеширование пароля
 
     def __str__(self):
         return self.username
+
+    def is_staff(self):
+        return self.is_admin

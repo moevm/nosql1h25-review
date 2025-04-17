@@ -1,37 +1,41 @@
 from django import forms
-from django.contrib.auth import authenticate
-from django.contrib.auth.forms import AuthenticationForm
-from django.utils.translation import gettext_lazy as _
-from . import models
-from mongoengine import DoesNotExist
+from .models import User
 
 
-class UsernameAuthenticationForm(AuthenticationForm):
+class LoginForm(forms.Form):
     username = forms.CharField(
+        label="Username",
         widget=forms.TextInput(attrs={
-            'placeholder': 'Username',
-            'class': 'login-input',
-            'autocomplete': 'username',
-            'id': 'id_username'
-        }),
-        label=_("Username"),
+            "placeholder": "Username",
+            "class": "login-input"
+        })
     )
-
     password = forms.CharField(
+        label="Password",
         widget=forms.PasswordInput(attrs={
-            'placeholder': 'Password',
-            'class': 'login-input',
-            'autocomplete': 'current-password',
-            'id': 'id_password'
+            "placeholder": "Password",
+            "class": "login-input"
         }),
-        label=_("Password"),
         strip=False,
     )
 
-    def clean_username(self):
-        username = self.cleaned_data.get('username')
-        try:
-            user = models.User.objects.get(username=username)
-        except DoesNotExist:
-            raise forms.ValidationError("Invalid username or password")
-        return user
+    def clean(self):
+        cleaned_data = super().clean()
+        username = cleaned_data.get("username")
+        password = cleaned_data.get("password")
+
+        if username and password:
+            # Используем filter вместо get, чтобы избежать исключения
+            user = User.objects.filter(username=username).first()
+
+            if not user:
+                raise forms.ValidationError("Invalid username or password")
+
+            # Проверка пароля
+            if not user.check_password(password):
+                raise forms.ValidationError("Invalid username or password")
+
+            # Сохраняем пользователя на форму для дальнейшего использования
+            self.user = user
+
+        return cleaned_data

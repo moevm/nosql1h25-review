@@ -56,7 +56,6 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'core.backends.MongoEngineBackend',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -99,29 +98,13 @@ LOGIN_REDIRECT_URL = '/'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': MONGODB_NAME,
+        'CLIENT': {
+            'host': MONGODB_URI,
+        }
     }
 }
-
-# Add to your settings.py
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        '': {  # Root logger
-            'handlers': ['console'],
-            'level': 'INFO',
-        },
-    },
-}
-
-mongoengine.connect(MONGODB_NAME, host='localhost', port=27017)
 
 
 
