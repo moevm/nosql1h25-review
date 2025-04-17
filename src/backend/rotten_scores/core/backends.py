@@ -4,6 +4,8 @@ from . import models
 from mongoengine.errors import DoesNotExist
 import logging
 
+from bson import ObjectId
+
 logger = logging.getLogger(__name__)
 
 
@@ -11,6 +13,7 @@ class MongoEngineBackend(BaseBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         try:
             user = models.User.objects.get(username=username)
+            print(user.id)
             logger.info(f"Найден пользователь: {user.username}")
             if user.check_password(password):
                 logger.info(f"Аутентификация прошла успешно для {username}")
@@ -23,8 +26,10 @@ class MongoEngineBackend(BaseBackend):
 
     def get_user(self, user_id):
         try:
-            obj_id = ObjectId(user_id)
-            return models.User.objects.get(id=obj_id)
+            for user in models.User.objects.all():
+                if user.id == ObjectId(user_id):
+                    return user
+            print("Not found")
         except DoesNotExist:
             logger.warning(f"Пользователь с id {user_id} не найден")
         except Exception as e:

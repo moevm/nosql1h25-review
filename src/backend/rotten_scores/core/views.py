@@ -5,7 +5,7 @@ from pymongo import MongoClient
 from django.conf import settings
 from datetime import datetime
 from django.views.generic.edit import FormView
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate
 import logging
 from django.urls import reverse_lazy
 from . import forms
@@ -15,17 +15,17 @@ from mongoengine.errors import DoesNotExist
 
 class HomepageView(TemplateView):
     template_name = 'core/homepage.html'
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
+
         # Подключение к MongoDB
         client = MongoClient(settings.MONGODB_URI)
         db = client[settings.MONGODB_NAME]
-        
+
         # Получаем выбранную платформу (по умолчанию PS5)
         platform = self.request.GET.get('platform', 'PS5')
-        
+
         # Получение новых релизов
         new_releases_pipeline = [
             {"$lookup": {
@@ -45,9 +45,9 @@ class HomepageView(TemplateView):
             {"$sort": {"release_date": -1}},
             {"$limit": 8}
         ]
-        
+
         new_releases = list(db.games.aggregate(new_releases_pipeline))
-        
+
         # Получение лучших игр на выбранной платформе
         best_platform_games_pipeline = [
             {"$match": {"platforms": {"$regex": platform, "$options": "i"}}},
@@ -69,14 +69,14 @@ class HomepageView(TemplateView):
             {"$sort": {"avg_rating": -1}},
             {"$limit": 8}
         ]
-        
+
         best_platform_games = list(db.games.aggregate(best_platform_games_pipeline))
-        
+
         # Получение списка всех доступных платформ
         all_platforms = [
             "PS5", "PC", "Nintendo Switch", "PS4", "Xbox Series X", "Xbox One"
         ]
-        
+
         # Форматирование дат и рейтингов
         for game in new_releases + best_platform_games:
             game['id'] = str(game['_id'])  # 💡 добавляем безопасный id для шаблона
@@ -98,7 +98,7 @@ class HomepageView(TemplateView):
             'all_platforms': all_platforms,
             'page_title': 'GameScore - Агрегатор отзывов и оценок видеоигр',
         })
-        
+
         return context
 
 
@@ -111,7 +111,15 @@ class LoginView(FormView):
         return self.request.POST.get('next', self.request.GET.get('next', '/'))
 
     def form_valid(self, form):
-        login(self.request, form.get_user())
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+
+        user = authenticate(self.request, username=username, password=password)
+
+        if user is None:
+            return self.form_invalid(form)
+
+        # login(self.request, user)  Функция для сохранения сессии (чтобы пользователя не выкидывало после обновления страницы)
 
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({
@@ -119,12 +127,13 @@ class LoginView(FormView):
                 'redirect_url': self.get_success_url(),
                 'user': {
                     'is_authenticated': True,
-                    'username': form.get_user().username
+                    'username': username
                 }
             })
         return super().form_valid(form)
 
     def form_invalid(self, form):
+        print(form.errors)
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({
                 'success': False,

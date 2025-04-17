@@ -29,7 +29,7 @@ class LoginForm(forms.Form):
             user = User.objects.filter(username=username).first()
 
             if not user:
-                raise forms.ValidationError("Invalid username or password")
+                raise forms.ValidationError("User does not exist")
 
             # Проверка пароля
             if not user.check_password(password):
