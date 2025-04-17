@@ -60,6 +60,8 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+
+
 ROOT_URLCONF = 'rotten_scores.urls'
 # MongoDB настройки
 MONGODB_URI = 'mongodb://localhost:27017/'
@@ -98,12 +100,13 @@ LOGIN_REDIRECT_URL = '/'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.dummy',
-        'NAME': MONGODB_NAME,
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
 mongoengine.connect(MONGODB_NAME, host='localhost', port=27017)
+
 
 
 # Password validation

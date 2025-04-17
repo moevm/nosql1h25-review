@@ -7,7 +7,7 @@ from mongoengine.errors import DoesNotExist
 class MongoEngineBackend(BaseBackend):
     def authenticate(self, request, username=None, password=None, **kwargs):
         try:
-            user = models.User.objects.get(username=username)
+            user = models.User.objects.get(email=username)
             if user.hashedPassword == password:
                 return user
         except DoesNotExist:

@@ -6,6 +6,7 @@ from django.conf import settings
 from datetime import datetime
 from django.views.generic.edit import FormView
 from django.contrib.auth import login
+import logging
 from django.urls import reverse_lazy
 from . import forms
 from . import models
@@ -101,9 +102,16 @@ class HomepageView(TemplateView):
         return context
 
 
+logger = logging.getLogger(__name__)
+
+
 class LoginView(FormView):
     template_name = 'registration/login.html'
-    form_class = forms.EmailAuthenticationForm
+    form_class = forms.UsernameAuthenticationForm
+
+    def get_success_url(self):
+        # Возвращаем URL, с которого пришел пользователь, или домашнюю страницу
+        return self.request.POST.get('next', self.request.GET.get('next', '/'))
 
     def form_valid(self, form):
         login(self.request, form.get_user())
