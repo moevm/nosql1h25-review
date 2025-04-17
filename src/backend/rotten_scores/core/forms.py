@@ -6,7 +6,6 @@ from . import models
 from mongoengine import DoesNotExist
 
 
-
 class UsernameAuthenticationForm(AuthenticationForm):
     username = forms.CharField(
         widget=forms.TextInput(attrs={

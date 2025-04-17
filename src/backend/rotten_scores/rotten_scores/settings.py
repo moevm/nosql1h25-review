@@ -61,7 +61,6 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 
-
 ROOT_URLCONF = 'rotten_scores.urls'
 # MongoDB настройки
 MONGODB_URI = 'mongodb://localhost:27017/'
@@ -103,6 +102,23 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
+}
+
+# Add to your settings.py
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        '': {  # Root logger
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    },
 }
 
 mongoengine.connect(MONGODB_NAME, host='localhost', port=27017)

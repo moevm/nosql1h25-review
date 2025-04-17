@@ -8,12 +8,11 @@
                 <img src="{% static 'img/logo.png' %}" alt="Logo" style="width: 70px; height: 70px;">
                 <a class="navbar-brand" href="{% url 'core:homepage' %}">RottenScores</a>
             </div>
-            
+
             <nav style="margin-right: auto;">
                 <a href="{% url 'games:game_list' %}" style="color: #FFBD3F; text-decoration: none; font-size: 1.2rem; margin-right: 2rem;">Games</a>
             </nav>
         </div>
-
         <!-- Поиск и кнопка -->
         <div style="display: flex; align-items: center; gap: 1.5rem;">
             <div style="position: relative;">
@@ -22,101 +21,128 @@
                 <img src="{% static 'img/search.png' %}" alt="Search"
                     style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px;">
             </div>
-            {% if user.is_authenticated %}
-        <!-- Иконка пользователя для авторизованных -->
-                <a href="{% url 'users:profile' %}" style="display: flex; align-items: center;">
-                    <img src="{% static 'img/user.png' %}" alt="Profile"
-                    style="width: 32px; height: 32px; border-radius: 50%;">
-                </a>
+
+            {% if user.authenticated %}
+                <div class="user-icon" style="cursor: pointer; position: relative;">
+                    <img src="{% static 'img/user.png' %}" alt="User" style="width: 32px; height: 32px; border-radius: 50%;">
+                    <div class="user-dropdown" style="display: none; position: absolute; right: 0; top: 100%; background-color: #1a1a1a; border-radius: 4px; width: 150px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 100; margin-top: 5px;">
+                        <div style="padding: 10px; border-bottom: 1px solid #333; text-align: center; font-weight: bold;">{{ user.username }}</div>
+                        <a href="{% url 'user_profile:profile' %}" style="display: block; padding: 10px; color: white; text-decoration: none;">Profile</a>
+                    </div>
+                </div>
             {% else %}
-        <!-- Кнопка входа для неавторизованных -->
-                <button id="authButton" style="background-color: #FFBD3F; color: black; border: none; border-radius: 0.25rem; padding: 0.5rem 1.5rem; cursor: pointer; font-weight: bold; white-space: nowrap;">
-                    Authorization
-                </button>
+                <button id="authButton" style="background-color: #FFBD3F; color: black; border: none; border-radius: 0.25rem; padding: 0.5rem 1.5rem; cursor: pointer; font-weight: bold; white-space: nowrap;">Authentication</button>
             {% endif %}
-    <div id="loginModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
-    <div style="background-color: #1a1a1a; padding: 2rem; border-radius: 0.5rem; width: 400px; max-width: 90%;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h2 style="margin: 0; color: white;">Login</h2>
-            <button id="closeModal" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
         </div>
-
-        <form id="loginForm" method="post" action="{% url 'users:login' %}">
-            {% csrf_token %}
-            <div style="margin-bottom: 1rem;">
-                <input type="email" name="username" placeholder="Email" required
-                    style="width: 100%; padding: 0.75rem; border-radius: 0.25rem; border: 1px solid #333; background-color: #2a2a2a; color: white;">
-            </div>
-            <div style="margin-bottom: 1.5rem;">
-                <input type="password" name="password" placeholder="Password" required
-                    style="width: 100%; padding: 0.75rem; border-radius: 0.25rem; border: 1px solid #333; background-color: #2a2a2a; color: white;">
-            </div>
-            <button type="submit"
-                    style="width: 100%; padding: 0.75rem; background-color: #FFBD3F; color: black; border: none; border-radius: 0.25rem; font-weight: bold; cursor: pointer;">
-                Login
-            </button>
-        </form>
     </div>
-</div>
+</header>
 
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Include the login modal template -->
+{% include "registration/login.html" %}
 
+<!-- JavaScript for modal functionality -->
 <script>
-    // Открытие модального окна
-    document.getElementById('authButton').addEventListener('click', function(e) {
-        e.preventDefault();
-        document.getElementById('loginModal').style.display = 'flex';
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal functionality
+    const modal = document.getElementById('loginModal');
+    const authButton = document.getElementById('authButton');
+    const closeModal = document.querySelector('.close-modal');
+    const loginForm = document.getElementById('loginForm');
 
-    // Закрытие модального окна
-    document.getElementById('closeModal').addEventListener('click', function() {
-        document.getElementById('loginModal').style.display = 'none';
-    });
 
-    // Закрытие при клике вне модального окна
-    document.getElementById('loginModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            this.style.display = 'none';
+
+    // Open modal when clicking the auth button
+    if (authButton) {
+        authButton.addEventListener('click', function() {
+            modal.style.display = 'block';
+        });
+    }
+
+    // Close modal when clicking the X
+    if (closeModal) {
+        closeModal.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+    }
+
+    // Close modal when clicking outside of it
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
         }
     });
 
-    // AJAX отправка формы
-    $(document).ready(function() {
-        $('#loginForm').on('submit', function(e) {
+    // Handle form submission with AJAX
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
-            $.ajax({
-                type: 'POST',
-                url: $(this).attr('action'),
-                data: $(this).serialize(),
-                success: function(response) {
+            // Reset error messages
+            document.getElementById('username-error').textContent = '';
+            document.getElementById('password-error').textContent = '';
+            document.getElementById('form-error').textContent = '';
+
+            const formData = new FormData(loginForm);
+            const xhr = new XMLHttpRequest();
+
+            xhr.open('POST', loginForm.action, true);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
                     if (response.success) {
-                        const userIconPath = "{% static 'img/user.png' %}";
-                        $('#authButton').replaceWith(
-                            `<a href="/profile/" style="display: flex; align-items: center;">
-                                <img src="${userIconPath}" alt="Profile"
-                                style="width: 32px; height: 32px; border-radius: 50%;">
-                            </a>`
-                        );
-
-                        $('#loginModal').hide();
-
-
-                        // Если нужно перенаправить
-                        if (response.redirect_url) {
-                            window.location.href = response.redirect_url;
-                        }
-                    } else {
-                        alert(response.error || 'Ошибка входа');
+                        // Reload the page to update the UI with the logged-in user
+                        window.location.reload();
                     }
-                },
-                error: function(xhr, status, error) {
-                    alert('Произошла ошибка: ' + error);
+                } else {
+                    // Handle errors
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.error) {
+                            document.getElementById('form-error').textContent = response.error;
+                        }
+                    } catch (e) {
+                        document.getElementById('form-error').textContent = 'An error occurred. Please try again.';
+                    }
                 }
-            });
+            };
+
+            xhr.onerror = function() {
+                document.getElementById('form-error').textContent = 'Network error. Please try again.';
+            };
+
+            xhr.send(formData);
         });
-    });
+    }
+
+    // User dropdown menu functionality
+    const userIcon = document.querySelector('.user-icon');
+    const userDropdown = document.querySelector('.user-dropdown');
+
+    if (userIcon && userDropdown) {
+        userIcon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (userDropdown.style.display === 'block') {
+                userDropdown.style.display = 'none';
+            } else {
+                userDropdown.style.display = 'block';
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+            userDropdown.style.display = 'none';
+        });
+
+        // Prevent closing when clicking inside dropdown
+        userDropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+});
 </script>
         </div>
     </div>
 </header>
+

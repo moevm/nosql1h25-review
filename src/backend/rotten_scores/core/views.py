@@ -102,9 +102,6 @@ class HomepageView(TemplateView):
         return context
 
 
-logger = logging.getLogger(__name__)
-
-
 class LoginView(FormView):
     template_name = 'registration/login.html'
     form_class = forms.UsernameAuthenticationForm
@@ -131,6 +128,6 @@ class LoginView(FormView):
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({
                 'success': False,
-                'error': form.errors.get('__all__', ['Неверный email или пароль'])[0]
+                'error': form.errors.get('__all__', ['Неверный username или пароль'])[0]
             }, status=400)
         return super().form_invalid(form)
