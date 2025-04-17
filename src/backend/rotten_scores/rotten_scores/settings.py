@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import mongoengine
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -54,6 +55,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'core.backends.MongoEngineBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 ROOT_URLCONF = 'rotten_scores.urls'
 # MongoDB настройки
 MONGODB_URI = 'mongodb://localhost:27017/'
@@ -62,7 +68,7 @@ MONGODB_NAME = 'game_reviews_db'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -84,7 +90,7 @@ STATICFILES_DIRS = [
 ]
 WSGI_APPLICATION = 'rotten_scores.wsgi.application'
 
-LOGIN_REDIRECT_URL = 'core:homepage'
+LOGIN_REDIRECT_URL = '/'
 
 
 # Database
@@ -92,10 +98,12 @@ LOGIN_REDIRECT_URL = 'core:homepage'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.dummy',
+        'NAME': MONGODB_NAME,
     }
 }
+
+mongoengine.connect(MONGODB_NAME, host='localhost', port=27017)
 
 
 # Password validation

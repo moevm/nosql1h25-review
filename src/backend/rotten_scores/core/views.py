@@ -1,10 +1,16 @@
 from django.shortcuts import render
+from django.http import JsonResponse
 from django.views.generic import TemplateView
 from pymongo import MongoClient
 from django.conf import settings
 from datetime import datetime
-import sys
-import os
+from django.views.generic.edit import FormView
+from django.contrib.auth import login
+from django.urls import reverse_lazy
+from . import forms
+from . import models
+from mongoengine.errors import DoesNotExist
+
 
 class HomepageView(TemplateView):
     template_name = 'core/homepage.html'
@@ -93,3 +99,30 @@ class HomepageView(TemplateView):
         })
         
         return context
+
+
+class LoginView(FormView):
+    template_name = 'registration/login.html'
+    form_class = forms.EmailAuthenticationForm
+
+    def form_valid(self, form):
+        login(self.request, form.get_user())
+
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'redirect_url': self.get_success_url(),
+                'user': {
+                    'is_authenticated': True,
+                    'username': form.get_user().username
+                }
+            })
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': False,
+                'error': form.errors.get('__all__', ['Неверный email или пароль'])[0]
+            }, status=400)
+        return super().form_invalid(form)

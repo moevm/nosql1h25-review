@@ -1,4 +1,3 @@
-<!-- header.html -->
 {% load static %}
 
 <header style="background-color: black; color: white; padding: 1rem;">
@@ -24,6 +23,16 @@
                     style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px;">
             </div>
             <button style="background-color: #FFBD3F; color: black; border: none; border-radius: 0.25rem; padding: 0.5rem 1.5rem; cursor: pointer; font-weight: bold; white-space: nowrap;">Authorization</button>
+            {% if user.is_authenticated %}
+                <a href="{% url 'profile:my_reviews_and_reviews' %}" style="display: flex; align-items: center;">
+                    <img src="{% static 'img/user.png' %}" alt="User Icon" style="width: 32px; height: 32px; border-radius: 50%;">
+                </a>
+            {% else %}
+                <button onclick="openLoginModal()" style="background-color: #FFBD3F; color: black; border: none; border-radius: 0.25rem; padding: 0.5rem 1.5rem; cursor: pointer; font-weight: bold;">
+                    Authentication
+                </button>
+            {% endif %}
+
         </div>
     </div>
 </header>
