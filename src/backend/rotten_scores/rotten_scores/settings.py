@@ -74,10 +74,14 @@ TEMPLATES = [
         },
     },
 ]
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'static',
+# ]
+STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / "static_dev",
+]
 WSGI_APPLICATION = 'rotten_scores.wsgi.application'
 
 LOGIN_REDIRECT_URL = 'core:homepage'
