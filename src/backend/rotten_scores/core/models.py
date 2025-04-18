@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from django.db import models
+from django.db import models, DatabaseError
 from django.utils import timezone
 from django.contrib.auth.hashers import make_password, check_password
 from djongo.models import ObjectIdField
@@ -51,6 +51,16 @@ class User(AbstractBaseUser):
 
     def is_staff(self):
         return self.is_admin
+
+    def save(self, *args, **kwargs):
+        try:
+            return super().save(*args, **kwargs)
+        except DatabaseError as e:
+            if "did not affect any rows" in str(e):
+                # Игнорируем ошибку, так как Djongo может не возвращать affected rows
+                pass
+            else:
+                raise
 
     class Meta:
         db_table = 'users'

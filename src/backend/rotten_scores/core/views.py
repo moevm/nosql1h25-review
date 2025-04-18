@@ -119,7 +119,8 @@ class LoginView(FormView):
         if user is None:
             return self.form_invalid(form)
 
-        # login(self.request, user)  Функция для сохранения сессии (чтобы пользователя не выкидывало после обновления страницы)
+        # TODO: заставить работать
+        login(self.request, user)  # Функция для сохранения сессии (для записи в куках)
 
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({
