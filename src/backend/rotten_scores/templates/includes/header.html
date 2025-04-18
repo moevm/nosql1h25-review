@@ -22,12 +22,12 @@
                     style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px;">
             </div>
 
-            {% if user.authenticated %}
+            {% if user.is_authenticated %}
                 <div class="user-icon" style="cursor: pointer; position: relative;">
                     <img src="{% static 'img/user.png' %}" alt="User" style="width: 32px; height: 32px; border-radius: 50%;">
                     <div class="user-dropdown" style="display: none; position: absolute; right: 0; top: 100%; background-color: #1a1a1a; border-radius: 4px; width: 150px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 100; margin-top: 5px;">
                         <div style="padding: 10px; border-bottom: 1px solid #333; text-align: center; font-weight: bold;">{{ user.username }}</div>
-                        <a href="{% url 'user_profile:profile' %}" style="display: block; padding: 10px; color: white; text-decoration: none;">Profile</a>
+                        <a href="{% url 'profile:my_reviews_and_reviews' %}" style="display: block; padding: 10px; color: white; text-decoration: none;">Profile</a>
                     </div>
                 </div>
             {% else %}

@@ -52,6 +52,10 @@ class User(AbstractBaseUser):
     def is_staff(self):
         return self.is_admin
 
+    @property
+    def is_authenticated(self):
+        return True
+
     def save(self, *args, **kwargs):
         try:
             return super().save(*args, **kwargs)
