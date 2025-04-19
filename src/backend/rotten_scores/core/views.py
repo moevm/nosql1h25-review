@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.generic import TemplateView
 from pymongo import MongoClient
@@ -6,11 +5,7 @@ from django.conf import settings
 from datetime import datetime
 from django.views.generic.edit import FormView
 from django.contrib.auth import login, authenticate
-import logging
-from django.urls import reverse_lazy
 from . import forms
-from . import models
-from mongoengine.errors import DoesNotExist
 
 
 class HomepageView(TemplateView):
@@ -22,10 +17,9 @@ class HomepageView(TemplateView):
         # Подключение к MongoDB
         client = MongoClient(settings.MONGODB_URI)
         db = client[settings.MONGODB_NAME]
-
-        # Получаем выбранную платформу (по умолчанию PS5)
-        platform = self.request.GET.get('platform', 'PS5')
-
+        
+        platform = self.request.GET.get('platform', 'PlayStation 5')
+        
         # Получение новых релизов
         new_releases_pipeline = [
             {"$lookup": {
@@ -37,20 +31,20 @@ class HomepageView(TemplateView):
             {"$project": {
                 "_id": 1,
                 "title": 1,
-                "image_ref": 1,
+                "image_ref": "$imageUrl",
                 "release_date": 1,
                 "platforms": 1,
                 "avg_rating": {"$avg": "$critic_reviews.rating"}
             }},
             {"$sort": {"release_date": -1}},
-            {"$limit": 8}
+            {"$limit": 6}
         ]
 
         new_releases = list(db.games.aggregate(new_releases_pipeline))
 
         # Получение лучших игр на выбранной платформе
         best_platform_games_pipeline = [
-            {"$match": {"platforms": {"$regex": platform, "$options": "i"}}},
+            {"$match": {"platforms": {"$in": [platform]}}},
             {"$lookup": {
                 "from": "critic_reviews",
                 "localField": "_id",
@@ -60,26 +54,26 @@ class HomepageView(TemplateView):
             {"$project": {
                 "_id": 1,
                 "title": 1,
-                "image_ref": 1,
+                "image_ref": "$imageUrl",
                 "release_date": 1,
                 "platforms": 1,
                 "avg_rating": {"$avg": "$critic_reviews.rating"}
             }},
-            {"$match": {"avg_rating": {"$gte": 85}}},  # Снижаем порог для получения большего числа игр
             {"$sort": {"avg_rating": -1}},
-            {"$limit": 8}
+            {"$limit": 6}
         ]
 
         best_platform_games = list(db.games.aggregate(best_platform_games_pipeline))
+        
+        # Получение списка 5 популярных платформ
+        all_platforms = ['PlayStation 5', 'PlayStation 4', 'Xbox One', 'Xbox','iOS']
+        # если хотим все платформы вывести
+        # all_platforms = db.games.distinct("platforms")
+        # all_platforms.sort()
 
-        # Получение списка всех доступных платформ
-        all_platforms = [
-            "PS5", "PC", "Nintendo Switch", "PS4", "Xbox Series X", "Xbox One"
-        ]
 
-        # Форматирование дат и рейтингов
         for game in new_releases + best_platform_games:
-            game['id'] = str(game['_id'])  # 💡 добавляем безопасный id для шаблона
+            game['id'] = str(game['_id'])
 
             if 'release_date' in game and game['release_date']:
                 if isinstance(game['release_date'], str):
@@ -88,8 +82,11 @@ class HomepageView(TemplateView):
                     except ValueError:
                         pass
 
-            if 'avg_rating' in game and game['avg_rating']:
+            if 'avg_rating' in game and game['avg_rating'] is not None:
                 game['avg_rating_display'] = round(game['avg_rating'])
+            else:
+                game['avg_rating_display'] = 0
+
 
         context.update({
             'new_releases': new_releases,

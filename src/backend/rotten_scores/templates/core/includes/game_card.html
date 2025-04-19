@@ -1,0 +1,29 @@
+<a href="{% url 'games:game_detail' game.id %}" class="text-decoration-none text-dark">
+    <div class="game-card-custom card shadow-sm border-0 h-100">
+        <img src="{{ game.image_ref|default:'https://via.placeholder.com/300x450?text=No+Image' }}"
+             class="card-img-top rounded-top" alt="{{ game.title }}">
+
+        <div class="card-body p-2 d-flex flex-column justify-content-between">
+            <h6 class="card-title mb-2 text-truncate">{{ game.title }}</h6>
+
+            {% if game.release_date %}
+            <p class="card-text mb-2"><small class="text-muted">{{ game.release_date|date:"d M Y" }}</small></p>
+            {% endif %}
+
+            <!-- Рейтинг внизу карточки -->
+            <div class="mt-auto">
+                <span class="badge 
+                    {% if game.avg_rating_display >= 85 %}bg-success
+                    {% elif game.avg_rating_display >= 70 %}bg-warning text-dark
+                    {% elif game.avg_rating_display %}bg-danger
+                    {% else %}bg-secondary{% endif %}">
+                    {% if game.avg_rating_display %}
+                        {{ game.avg_rating_display }} / 100
+                    {% else %}
+                        Not Rated
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+</a>
