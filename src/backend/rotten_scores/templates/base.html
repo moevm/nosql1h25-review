@@ -6,7 +6,7 @@
     <title>{% block title %}RottenScores{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     {% block extra_head %}{% endblock %}
     <style>
         body {
@@ -18,10 +18,21 @@
             color: inherit;
         }
     </style>
+    <style>
+        .login-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            margin-top: 0.25rem;
+        }
+    </style>
 </head>
 <body>
 
     {% include 'includes/header.html' %}
+
 
     <main style="min-height: 70vh; padding: 2rem;">
         {% block content %}
@@ -30,6 +41,37 @@
     </main>
 
     {% include 'includes/footer.html' %}
+
+
+    <script>
+        // Функция для получения CSRF токена
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Установка CSRF токена для AJAX запросов
+        const csrftoken = getCookie('csrftoken');
+
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                }
+            }
+        });
+    </script>
 
 </body>
 </html>

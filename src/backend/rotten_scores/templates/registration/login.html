@@ -1,40 +1,37 @@
-{% extends "base.html" %}
+{% load static %}
 
-{% block content %}
-
-<!-- Этот блок мы уберём, в нашей форме ошибки выводятся внутри формы. -->
-{% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
-
-{% if next %}
-    {% if user.is_authenticated %}
-    <p>Your account doesn't have access to this page. To proceed,
-    please login with an account that has access.</p>
-    {% else %}
-    <p>Please login to see this page.</p>
-    {% endif %}
-{% endif %}
-
-<form method="post" action="{% url 'login' %}">
-{% csrf_token %}
-<table>
-<tr>
-    <td>{{ form.username.label_tag }}</td>
-    <td>{{ form.username }}</td>
-</tr>
-<tr>
-    <td>{{ form.password.label_tag }}</td>
-    <td>{{ form.password }}</td>
-</tr>
-</table>
-
-<input type="submit" value="login">
-<!-- Этот тег надо будет перенести в нашу форму. -->
-<input type="hidden" name="next" value="{{ next }}">
-</form>
-
-{# Assumes you setup the password_reset view in your URLconf #}
-<p><a href="{% url 'password_reset' %}">Lost password?</a></p>
-
-{% endblock %}
+<!-- Login Modal Template -->
+<div id="loginModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7);">
+  <div class="modal-content" style="background-color: #1a1a1a; margin: 15% auto; padding: 20px; border-radius: 8px; width: 400px; max-width: 90%; box-shadow: 0 4px 8px rgba(0,0,0,0.3);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h2 style="color: white; margin: 0; font-size: 2rem;">Login</h2>
+      <span class="close-modal" style="color: white; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+    </div>
+    
+    <form id="loginForm" method="post" action="{% url 'users:login' %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.path }}">
+      
+      <div class="form-group" style="margin-bottom: 20px;">
+        <input type="text" name="username" id="id_username" class="login-input" 
+               placeholder="Username" autocomplete="username" required
+               style="width: 100%; padding: 12px; background-color: #2a2a2a; border: none; border-radius: 4px; color: white; font-size: 1rem;">
+        <div class="error-message" id="username-error" style="color: #ff6b6b; margin-top: 5px; font-size: 0.9rem;"></div>
+      </div>
+      
+      <div class="form-group" style="margin-bottom: 20px;">
+        <input type="password" name="password" id="id_password" class="login-input" 
+               placeholder="Password" autocomplete="current-password" required
+               style="width: 100%; padding: 12px; background-color: #2a2a2a; border: none; border-radius: 4px; color: white; font-size: 1rem;">
+        <div class="error-message" id="password-error" style="color: #ff6b6b; margin-top: 5px; font-size: 0.9rem;"></div>
+      </div>
+      
+      <div class="form-error" id="form-error" style="color: #ff6b6b; margin-bottom: 15px; font-size: 0.9rem;"></div>
+      
+      <button type="submit" 
+              style="width: 100%; background-color: #FFBD3F; color: black; padding: 12px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 1rem;">
+        Login
+      </button>
+    </form>
+  </div>
+</div>

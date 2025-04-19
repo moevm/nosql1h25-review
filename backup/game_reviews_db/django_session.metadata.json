@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"bbe526e03ee344bbad0c22c2887a2638","collectionName":"django_session","type":"collection"}

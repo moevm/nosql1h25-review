@@ -1,4 +1,3 @@
-<!-- header.html -->
 {% load static %}
 
 <header style="background-color: black; color: white; padding: 1rem;">
@@ -9,12 +8,11 @@
                 <img src="{% static 'img/logo.png' %}" alt="Logo" style="width: 70px; height: 70px;">
                 <a class="navbar-brand" href="{% url 'core:homepage' %}">RottenScores</a>
             </div>
-            
+
             <nav style="margin-right: auto;">
                 <a href="{% url 'games:game_list' %}" style="color: #FFBD3F; text-decoration: none; font-size: 1.2rem; margin-right: 2rem;">Games</a>
             </nav>
         </div>
-
         <!-- Поиск и кнопка -->
         <div style="display: flex; align-items: center; gap: 1.5rem;">
             <div style="position: relative;">
@@ -23,7 +21,126 @@
                 <img src="{% static 'img/search.png' %}" alt="Search"
                     style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px;">
             </div>
-            <button style="background-color: #FFBD3F; color: black; border: none; border-radius: 0.25rem; padding: 0.5rem 1.5rem; cursor: pointer; font-weight: bold; white-space: nowrap;">Authorization</button>
+
+            {% if user.is_authenticated %}
+                <div class="user-icon" style="cursor: pointer; position: relative;">
+                    <img src="{% static 'img/user.png' %}" alt="User" style="width: 32px; height: 32px; border-radius: 50%;">
+                    <div class="user-dropdown" style="display: none; position: absolute; right: 0; top: 100%; background-color: #1a1a1a; border-radius: 4px; width: 150px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 100; margin-top: 5px;">
+                        <div style="padding: 10px; border-bottom: 1px solid #333; text-align: center; font-weight: bold;">{{ user.username }}</div>
+                        <a href="{% url 'profile:my_rating_and_reviews' %}" style="display: block; padding: 10px; color: white; text-decoration: none;">Profile</a>
+                    </div>
+                </div>
+            {% else %}
+                <button id="authButton" style="background-color: #FFBD3F; color: black; border: none; border-radius: 0.25rem; padding: 0.5rem 1.5rem; cursor: pointer; font-weight: bold; white-space: nowrap;">Authentication</button>
+            {% endif %}
         </div>
     </div>
 </header>
+
+<!-- Include the login modal template -->
+{% include "registration/login.html" %}
+
+<!-- JavaScript for modal functionality -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal functionality
+    const modal = document.getElementById('loginModal');
+    const authButton = document.getElementById('authButton');
+    const closeModal = document.querySelector('.close-modal');
+    const loginForm = document.getElementById('loginForm');
+
+
+
+    // Open modal when clicking the auth button
+    if (authButton) {
+        authButton.addEventListener('click', function() {
+            modal.style.display = 'block';
+        });
+    }
+
+    // Close modal when clicking the X
+    if (closeModal) {
+        closeModal.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+    }
+
+    // Close modal when clicking outside of it
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    // Handle form submission with AJAX
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Reset error messages
+            document.getElementById('username-error').textContent = '';
+            document.getElementById('password-error').textContent = '';
+            document.getElementById('form-error').textContent = '';
+
+            const formData = new FormData(loginForm);
+            const xhr = new XMLHttpRequest();
+
+            xhr.open('POST', loginForm.action, true);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.success) {
+                        // Reload the page to update the UI with the logged-in user
+                        window.location.reload();
+                    }
+                } else {
+                    // Handle errors
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.error) {
+                            document.getElementById('form-error').textContent = response.error;
+                        }
+                    } catch (e) {
+                        document.getElementById('form-error').textContent = 'An error occurred. Please try again.';
+                    }
+                }
+            };
+
+            xhr.onerror = function() {
+                document.getElementById('form-error').textContent = 'Network error. Please try again.';
+            };
+
+            xhr.send(formData);
+        });
+    }
+
+    // User dropdown menu functionality
+    const userIcon = document.querySelector('.user-icon');
+    const userDropdown = document.querySelector('.user-dropdown');
+
+    if (userIcon && userDropdown) {
+        userIcon.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (userDropdown.style.display === 'block') {
+                userDropdown.style.display = 'none';
+            } else {
+                userDropdown.style.display = 'block';
+            }
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function() {
+            userDropdown.style.display = 'none';
+        });
+
+        // Prevent closing when clicking inside dropdown
+        userDropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+});
+</script>
+
+
