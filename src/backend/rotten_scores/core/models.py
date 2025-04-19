@@ -56,6 +56,10 @@ class User(AbstractBaseUser):
     def is_authenticated(self):
         return True
 
+    def logout(self):
+
+        pass
+
     def save(self, *args, **kwargs):
         try:
             return super().save(*args, **kwargs)
