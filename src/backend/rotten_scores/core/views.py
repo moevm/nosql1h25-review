@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.http import JsonResponse
 from django.views.generic import TemplateView
 from pymongo import MongoClient
@@ -6,11 +5,7 @@ from django.conf import settings
 from datetime import datetime
 from django.views.generic.edit import FormView
 from django.contrib.auth import login, authenticate
-import logging
-from django.urls import reverse_lazy
 from . import forms
-from . import models
-from mongoengine.errors import DoesNotExist
 
 
 class HomepageView(TemplateView):
