@@ -26,11 +26,11 @@ class HomepageView(TemplateView):
                 "_id": 1,
                 "title": 1,
                 "image_ref": "$imageUrl",
-                "release_date": 1,
+                "releaseDate": 1,
                 "platforms": 1,
                 "avg_rating": "$stats.criticReviews.avgRating"  
             }},
-            {"$sort": {"release_date": -1}},
+            {"$sort": {"releaseDate": -1}},
             {"$limit": 6}
         ]
 
@@ -43,7 +43,7 @@ class HomepageView(TemplateView):
                 "_id": 1,
                 "title": 1,
                 "image_ref": "$imageUrl",
-                "release_date": 1,
+                "releaseDate": 1,
                 "platforms": 1,
                 "avg_rating": "$stats.criticReviews.avgRating"
             }},
