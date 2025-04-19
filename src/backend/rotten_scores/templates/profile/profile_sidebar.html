@@ -14,7 +14,7 @@
             {% endif %}
 
             <div class="menu-item sign-out-container">
-                <a href="{% url 'core:homepage' %}" class="sign-out-link">Sign Out</a>
+                <a href="{% url 'core:logout' %}" class="sign-out-link">Sign Out</a>
             </div>
         </div>
     </div>
@@ -24,9 +24,9 @@
     .sidebar-container {
         display: flex;
         flex-direction: column;
-        height: calc(100vh - [header_height]px); /* Замените [header_height] на реальную высоту вашего хедера */
+        height: calc(100vh - [header_height]px);
         position: sticky;
-        top: [header_height]px; /* Такое же значение как выше */
+        top: [header_height]px;
     }
 
     .sidebar {
@@ -67,7 +67,7 @@
     }
 
     .sign-out-container {
-        margin-top: auto; /* Прижимает к низу */
+        margin-top: auto;
         padding: 12px 0;
     }
 
