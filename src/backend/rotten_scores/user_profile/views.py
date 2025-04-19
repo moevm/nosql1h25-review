@@ -1,7 +1,5 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound
-from pymongo.auth import logout
-
 
 def my_reviews_and_reviews(request):
     return render(request, 'profile/base_profile.html')
