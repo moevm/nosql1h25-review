@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ game.title }} | Game Detail{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <img src="{{ game.imageUrl|default:'https://via.placeholder.com/400x600' }}" class="img-fluid" alt="{{ game.title }}">
+        </div>
+        <div class="col-md-8">
+            <h1>{{ game.title }}</h1>
+            <p><strong>Developer:</strong> {{ game.developer }}</p>
+            <p><strong>Publisher:</strong> {{ game.publisher }}</p>
+            <p><strong>Release Date:</strong> {{ game.release_date_formatted }}</p>
+            <p><strong>Genres:</strong> {{ game.genres|join:", " }}</p>
+            <p><strong>Platforms:</strong> {{ game.platforms|join:", " }}</p>
+            <p>{{ game.description }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
