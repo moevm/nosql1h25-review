@@ -9,7 +9,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(('core.urls', 'core'), namespace='core')),
     path('profile/', include(('user_profile.urls', 'user_profile'), namespace='user_profile')),
-    path('profile/admin_panel/', include(('admin_panel.urls', 'admin_panel'), namespace='admin_panel')),
     path('games/', include(('games.urls', 'games'), namespace='games')),
     path('reviews/', include(('reviews.urls', 'reviews'), namespace='reviews')),
 ]
