@@ -10,15 +10,34 @@
             <p class="card-text mb-2"><small class="text-muted">{{ game.release_date|date:"d M Y" }}</small></p>
             {% endif %}
 
-            <!-- Рейтинг внизу карточки -->
-            <div class="mt-auto">
-                <span class="badge 
-                    {% if game.avg_rating_display >= 85 %}bg-success
-                    {% elif game.avg_rating_display >= 70 %}bg-warning text-dark
-                    {% elif game.avg_rating_display %}bg-danger
-                    {% else %}bg-secondary{% endif %}">
+            <!-- Рейтинг аккуратно снизу справа -->
+            <div class="d-flex justify-content-end">
+                <span style="
+                    font-size: 0.95rem;
+                    font-weight: 600;
+                    padding: 0.4rem 0.7rem;
+                    border-radius: 0.5rem;
+                    background-color:
+                        {% if game.avg_rating_display >= 85 %}
+                            #28a745
+                        {% elif game.avg_rating_display >= 70 %}
+                            #ffc107
+                        {% elif game.avg_rating_display %}
+                            #dc3545
+                        {% else %}
+                            gray
+                        {% endif %}
+                    ;
+                    color:
+                        {% if game.avg_rating_display >= 70 and game.avg_rating_display < 85 %}
+                            #212529
+                        {% else %}
+                            white
+                        {% endif %}
+                    ;
+                ">
                     {% if game.avg_rating_display %}
-                        {{ game.avg_rating_display }} / 100
+                        {{ game.avg_rating_display }}
                     {% else %}
                         Not Rated
                     {% endif %}
