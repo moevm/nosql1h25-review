@@ -19,8 +19,8 @@
 
 Админ 
 
-Почта `admin_user@test.com` Пароль `admin`
+Логин `admin_user` Пароль `admin`
 
 Пользователь 
 
-Почта `ordinary_user@test.com` Пароль `ordinary`
+Логин `ordinary_user` Пароль `ordinary`
