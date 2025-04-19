@@ -22,19 +22,13 @@ class HomepageView(TemplateView):
         
         # Получение новых релизов
         new_releases_pipeline = [
-            {"$lookup": {
-                "from": "critic_reviews",
-                "localField": "_id",
-                "foreignField": "game_id",
-                "as": "critic_reviews"
-            }},
             {"$project": {
                 "_id": 1,
                 "title": 1,
                 "image_ref": "$imageUrl",
                 "release_date": 1,
                 "platforms": 1,
-                "avg_rating": {"$avg": "$critic_reviews.rating"}
+                "avg_rating": "$stats.criticReviews.avgRating"  
             }},
             {"$sort": {"release_date": -1}},
             {"$limit": 6}
@@ -45,19 +39,13 @@ class HomepageView(TemplateView):
         # Получение лучших игр на выбранной платформе
         best_platform_games_pipeline = [
             {"$match": {"platforms": {"$in": [platform]}}},
-            {"$lookup": {
-                "from": "critic_reviews",
-                "localField": "_id",
-                "foreignField": "game_id",
-                "as": "critic_reviews"
-            }},
             {"$project": {
                 "_id": 1,
                 "title": 1,
                 "image_ref": "$imageUrl",
                 "release_date": 1,
                 "platforms": 1,
-                "avg_rating": {"$avg": "$critic_reviews.rating"}
+                "avg_rating": "$stats.criticReviews.avgRating"
             }},
             {"$sort": {"avg_rating": -1}},
             {"$limit": 6}
