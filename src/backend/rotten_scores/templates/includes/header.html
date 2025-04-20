@@ -15,12 +15,13 @@
         </div>
         <!-- Поиск и кнопка -->
         <div style="display: flex; align-items: center; gap: 1.5rem;">
-            <div style="position: relative;">
-                <input type="text" placeholder="Search"
-                    style="width: 200px; padding: 0.5rem 2rem 0.5rem 0.75rem; border-radius: 0.25rem; border: none;">
-                <img src="{% static 'img/search.png' %}" alt="Search"
-                    style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px;">
-            </div>
+            <form method="get" action="{% url 'game_list' %}" style="position: relative;">
+            <input id="search-input" name="q" type="text" placeholder="Search"
+                style="width: 200px; padding: 0.5rem 2rem 0.5rem 0.75rem; border-radius: 0.25rem; border: none;">
+            <div id="search-results" style="position: absolute; background: white; width: 100%; z-index: 1000; display: none;"></div>
+            <img src="{% static 'img/search.png' %}" alt="Search"
+                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px;">
+            </form>
 
             {% if user.is_authenticated %}
                 <div class="user-icon" style="cursor: pointer; position: relative;">
@@ -138,6 +139,70 @@ document.addEventListener('DOMContentLoaded', function() {
         // Prevent closing when clicking inside dropdown
         userDropdown.addEventListener('click', function(e) {
             e.stopPropagation();
+        });
+    }
+
+    // Real-time search suggestions
+    const searchInput = document.getElementById('search-input');
+    const searchResults = document.getElementById('search-results');
+
+    if (searchInput && searchResults) {
+        searchInput.addEventListener('input', function () {
+            const query = this.value.trim();
+
+            if (query.length === 0) {
+                searchResults.innerHTML = '';
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            fetch(`/games/search/?q=${encodeURIComponent(query)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    searchResults.innerHTML = '';
+                    if (data.length > 0) {
+                        data.forEach(game => {
+                            const li = document.createElement('li');
+                            li.style.padding = '0.5rem';
+                            li.style.borderBottom = '1px solid #eee';
+                            li.style.cursor = 'pointer';
+                            li.innerHTML = `
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    <img src="${game.cover_url || '#'}" alt="${game.title}" style="width: 30px; height: 45px; object-fit: cover;">
+                                    <div>
+                                        <div style="font-weight: bold;">${game.title}</div>
+                                        <div style="font-size: 0.8rem; color: #666;">
+                                            ${game.release_date || 'N/A'} | Score: ${game.critic_score || 'N/A'}
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            li.addEventListener('click', () => {
+                                window.location.href = `/games/${game.id}/`; // Перенаправление на страницу игры
+                            });
+                            searchResults.appendChild(li);
+                        });
+                        searchResults.style.display = 'block';
+                    } else {
+                        searchResults.innerHTML = '<li style="padding: 0.5rem;">No results found</li>';
+                        searchResults.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    searchResults.innerHTML = '<li style="padding: 0.5rem;">Error loading results</li>';
+                    searchResults.style.display = 'block';
+                });
+        });
+
+        // Hide suggestions on outside click
+        document.addEventListener('click', function (e) {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
         });
     }
 });
