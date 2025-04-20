@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+    body {
+        margin: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    .profile-container {
+        display: flex;
+        flex: 1;
+        min-height: calc(100vh - 100px - 150px);
+    }
+
+    .main-content {
+        flex: 1;
+        padding: 32px;
+        background-color: #fff;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    {% include 'profile/profile_sidebar.html' %}
+
+    <div class="main-content" id="main-content">
+        <!-- Контент будет загружаться динамически -->
+        {% include 'profile/sections/ratings.html' %}
+    </div>
+</div>
+{% endblock %}
