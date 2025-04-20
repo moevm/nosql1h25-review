@@ -1,0 +1,48 @@
+<a href="{% url 'games:game_detail' game.id %}" class="text-decoration-none text-dark">
+    <div class="game-card-custom card shadow-sm border-0 h-100">
+        <img src="{{ game.image_ref|default:'https://via.placeholder.com/300x450?text=No+Image' }}"
+             class="card-img-top rounded-top" alt="{{ game.title }}">
+
+        <div class="card-body p-2 d-flex flex-column justify-content-between">
+            <h6 class="card-title mb-2 text-truncate">{{ game.title }}</h6>
+
+            {% if game.release_date %}
+            <p class="card-text mb-2"><small class="text-muted">{{ game.release_date|date:"d M Y" }}</small></p>
+            {% endif %}
+
+            <!-- Рейтинг аккуратно снизу справа -->
+            <div class="d-flex justify-content-end">
+                <span style="
+                    font-size: 0.95rem;
+                    font-weight: 600;
+                    padding: 0.4rem 0.7rem;
+                    border-radius: 0.5rem;
+                    background-color:
+                        {% if game.avg_rating_display >= 85 %}
+                            #28a745
+                        {% elif game.avg_rating_display >= 70 %}
+                            #ffc107
+                        {% elif game.avg_rating_display %}
+                            #dc3545
+                        {% else %}
+                            gray
+                        {% endif %}
+                    ;
+                    color:
+                        {% if game.avg_rating_display >= 70 and game.avg_rating_display < 85 %}
+                            #212529
+                        {% else %}
+                            white
+                        {% endif %}
+                    ;
+                ">
+                    {% if game.avg_rating_display %}
+                        {{ game.avg_rating_display }}
+                    {% else %}
+                        Not Rated
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+</a>

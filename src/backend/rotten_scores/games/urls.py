@@ -3,5 +3,5 @@ from . import views
 
 urlpatterns = [
     path('', views.game_list, name='game_list'),
-    path('<int:pk>/', views.game_detail, name='game_detail'),
+    path('<str:pk>/', views.game_detail, name='game_detail'),
 ]
