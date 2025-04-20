@@ -142,69 +142,155 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Real-time search suggestions
-    const searchInput = document.getElementById('search-input');
-    const searchResults = document.getElementById('search-results');
+// Real-time search suggestions
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
 
-    if (searchInput && searchResults) {
-        searchInput.addEventListener('input', function () {
-            const query = this.value.trim();
+if (searchInput && searchResults) {
+    searchInput.addEventListener('input', function () {
+        const query = this.value.trim();
 
-            if (query.length === 0) {
+        if (query.length === 0) {
+            searchResults.innerHTML = '';
+            searchResults.style.display = 'none';
+            return;
+        }
+
+        fetch(`/games/search/?q=${encodeURIComponent(query)}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                console.log('Search results:', data);
                 searchResults.innerHTML = '';
-                searchResults.style.display = 'none';
-                return;
-            }
 
-            fetch(`/games/search/?q=${encodeURIComponent(query)}`)
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(data => {
-                    searchResults.innerHTML = '';
-                    if (data.length > 0) {
-                        data.forEach(game => {
-                            const li = document.createElement('li');
-                            li.style.padding = '0.5rem';
-                            li.style.borderBottom = '1px solid #eee';
-                            li.style.cursor = 'pointer';
-                            li.innerHTML = `
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <img src="${game.cover_url || '#'}" alt="${game.title}" style="width: 30px; height: 45px; object-fit: cover;">
-                                    <div>
-                                        <div style="font-weight: bold;">${game.title}</div>
-                                        <div style="font-size: 0.8rem; color: #666;">
-                                            ${game.release_date || 'N/A'} | Score: ${game.critic_score || 'N/A'}
+                // Ширина результатов на 100px больше ширины поля ввода
+                searchResults.style.width = (searchInput.offsetWidth + 100) + 'px';
+
+                if (data.length > 0) {
+                    data.forEach(game => {
+                        const li = document.createElement('li');
+                        // Оптимальные размеры карточки
+                        li.style.cssText = `
+                            padding: 12px 15px;
+                            border-bottom: 1px solid #eee;
+                            cursor: pointer;
+                            background-color: white;
+                            min-height: 85px;
+                            box-sizing: border-box;
+                            display: flex;
+                            align-items: center;
+                        `;
+
+                        // Оптимальное количество символов (40)
+                        const maxLength = 40;
+                        const displayTitle = game.title.length > maxLength
+                            ? game.title.substring(0, maxLength) + '..'
+                            : game.title;
+
+                        // Форматируем дату (предполагаем, что бекенд уже вернул в нужном формате)
+                        const formattedDate = game.releaseDate || 'N/A';
+
+                        li.innerHTML = `
+                            <div style="
+                                display: flex;
+                                align-items: center;
+                                gap: 15px;
+                                width: 100%;
+                                height: 100%;
+                            ">
+                                <img src="${game.imageUrl || '#'}" alt="${game.title}"
+                                     style="
+                                         width: 55px;
+                                         height: 70px;
+                                         object-fit: cover;
+                                         flex-shrink: 0;
+                                     ">
+                                <div style="
+                                    flex: 1;
+                                    min-width: 0;
+                                    display: flex;
+                                    flex-direction: column;
+                                    justify-content: center;
+                                ">
+                                    <div style="
+                                        font-weight: bold;
+                                        color: black;
+                                        font-size: 15px;
+                                        white-space: nowrap;
+                                        overflow: hidden;
+                                        text-overflow: ellipsis;
+                                        margin-bottom: 5px;
+                                        width: 100%;
+                                    " title="${game.title}">
+                                        ${displayTitle}
+                                    </div>
+                                    <div style="
+                                        display: flex;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                        width: 100%;
+                                    ">
+                                        <div style="
+                                            font-size: 13px;
+                                            color: #666;
+                                        ">
+                                            ${formattedDate}
+                                        </div>
+                                        <div style="
+                                            font-size: 16px;
+                                            font-weight: bold;
+                                            color: #333;
+                                            margin-left: 10px;
+                                        ">
+                                            ${game.criticRating || 'N/A'}
                                         </div>
                                     </div>
+                                    <div style="
+                                        font-size: 12px;
+                                        color: #888;
+                                        margin-top: 3px;
+                                    ">
+                                        ${game.genres || 'Genre not specified'} | ${game.platforms || ''}
+                                    </div>
                                 </div>
-                            `;
-                            li.addEventListener('click', () => {
-                                window.location.href = `/games/${game.id}/`; // Перенаправление на страницу игры
-                            });
-                            searchResults.appendChild(li);
-                        });
-                        searchResults.style.display = 'block';
-                    } else {
-                        searchResults.innerHTML = '<li style="padding: 0.5rem;">No results found</li>';
-                        searchResults.style.display = 'block';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    searchResults.innerHTML = '<li style="padding: 0.5rem;">Error loading results</li>';
-                    searchResults.style.display = 'block';
-                });
-        });
+                            </div>
+                        `;
 
-        // Hide suggestions on outside click
-        document.addEventListener('click', function (e) {
-            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                searchResults.style.display = 'none';
-            }
-        });
-    }
+                        li.addEventListener('click', () => {
+                            window.location.href = `/games/${game.id}/`;
+                        });
+
+                        li.addEventListener('mouseenter', () => {
+                            li.style.backgroundColor = '#f5f5f5';
+                        });
+
+                        li.addEventListener('mouseleave', () => {
+                            li.style.backgroundColor = 'white';
+                        });
+
+                        searchResults.appendChild(li);
+                    });
+                    searchResults.style.display = 'block';
+                } else {
+                    searchResults.innerHTML = '<li style="padding: 12px 15px; color: black; min-height: 60px; display: flex; align-items: center;">No results found</li>';
+                    searchResults.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                searchResults.innerHTML = '<li style="padding: 12px 15px; color: black; min-height: 60px; display: flex; align-items: center;">Error loading results</li>';
+                searchResults.style.display = 'block';
+            });
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.style.display = 'none';
+        }
+    });
+}
 });
 </script>
 
