@@ -16,7 +16,7 @@ def game_list(request):
         games = Game.objects.all()
     return render(request, 'game_list.html', {'games': games, 'query': query})
 
-def game_detail(request):
+def game_detail(request, pk):
     return HttpResponse("Заглушка детали игры")
 
 logger = logging.getLogger(__name__)
