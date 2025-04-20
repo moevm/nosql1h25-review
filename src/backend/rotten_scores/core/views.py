@@ -10,7 +10,6 @@ import logging
 from django.urls import reverse_lazy
 from . import forms
 from . import models
-from mongoengine.errors import DoesNotExist
 
 
 class HomepageView(TemplateView):
