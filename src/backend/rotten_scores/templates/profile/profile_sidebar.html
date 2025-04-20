@@ -14,11 +14,10 @@
                 <div class="menu-item" data-section="admin">Admin</div>
                 {% endif %}
             </div>
-
+            <div class="sign-out-spacer"></div>
             <div class="menu-item sign-out-container">
                 <a href="{% url 'core:logout' %}" class="sign-out-link">Sign Out</a>
             </div>
-            <div class="sign-out-spacer"></div>
         </div>
     </div>
 </div>
@@ -81,13 +80,15 @@
         display: block;
         padding: 12px 24px;
         text-decoration: none;
-        color: inherit;
+        color: #ff0000;
+        font-weight: 600;
     }
 
     .sign-out-link:hover {
         background-color: #e9ecef;
-        color: #000;
+        color: #cc0000; 
     }
+
     .sign-out-spacer {
         height: 300px;
     }
