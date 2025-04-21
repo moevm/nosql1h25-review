@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
 from django.contrib import messages
 from .forms import ChangePersonalDataForm, ChangePasswordForm
 
@@ -41,45 +40,32 @@ def load_section(request):
         return HttpResponseNotFound("Section not found")
 
 
-class MyAccountView(LoginRequiredMixin, TemplateView):
-    template_name = 'profile/base_profile.html'
+def account(request):
+    personal_form = ChangePersonalDataForm(user=request.user)
+    password_form = ChangePasswordForm(user=request.user)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['personal_form'] = ChangePersonalDataForm(user=self.request.user, initial={
-            'username': self.request.user.username,
-            'email': self.request.user.email
-        })
-        context['password_form'] = ChangePasswordForm(user=self.request.user)
-        return context
+    if request.method == 'POST':
+        if 'form_type' in request.POST:
+            form_type = request.POST['form_type']
 
-    def post(self, request, *args, **kwargs):
-        form_type = request.POST.get('form_type')
+            if form_type == 'personal' and personal_form.is_valid():
+                personal_form.save()
+                return custom_logout(request)
 
-        if form_type == 'personal':
-            form = ChangePersonalDataForm(request.POST, user=request.user)
-        elif form_type == 'password':
-            form = ChangePasswordForm(request.POST, user=request.user)
-        else:
-            messages.error(request, "Invalid form type")
-            return self.get(request, *args, **kwargs)  # Показываем форму заново
+            elif form_type == 'password' and password_form.is_valid():
+                password_form.save()
+                return custom_logout(request)
 
-        if form.is_valid():
-            form.save()
-            return redirect(f"{request.path}?section=account")
-        else:
-            messages.error(request, f"Please correct the errors in the {form_type} form.")
+    context = {
+        'personal_form': personal_form,
+        'password_form': password_form,
+    }
 
-            context = self.get_context_data()
-            if form_type == 'personal':
-                context['personal_form'] = form
-            elif form_type == 'password':
-                context['password_form'] = form
-
-            return self.render_to_response(context)
+    return render(request, 'profile/sections/account.html', context)
 
 
 def statistics(request):
     return HttpResponse("Заглушка")
+
 def admin_panel(request):
     return HttpResponse("Заглушка")

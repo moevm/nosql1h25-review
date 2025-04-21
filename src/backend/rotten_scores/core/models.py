@@ -56,7 +56,6 @@ class User(AbstractBaseUser):
         return True
 
     def logout(self):
-
         pass
 
     def save(self, *args, **kwargs):

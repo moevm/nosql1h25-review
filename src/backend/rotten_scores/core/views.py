@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.views.generic import TemplateView
+from django.http import HttpResponse
 from pymongo import MongoClient
 from django.conf import settings
 from datetime import datetime
@@ -59,7 +60,6 @@ class HomepageView(TemplateView):
         # all_platforms = db.games.distinct("platforms")
         # all_platforms.sort()
 
-
         for game in new_releases + best_platform_games:
             game['id'] = str(game['_id'])
 
@@ -74,7 +74,6 @@ class HomepageView(TemplateView):
                 game['avg_rating_display'] = round(game['avg_rating'])
             else:
                 game['avg_rating_display'] = 0
-
 
         context.update({
             'new_releases': new_releases,
@@ -126,3 +125,8 @@ class LoginView(FormView):
                 'error': form.errors.get('__all__', ['Неверный username или пароль'])[0]
             }, status=400)
         return super().form_invalid(form)
+
+
+def database_view(request):
+    return HttpResponse("Заглушка для Database")
+
