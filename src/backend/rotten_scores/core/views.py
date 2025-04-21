@@ -11,7 +11,7 @@ from pymongo import MongoClient
 import json
 from bson import json_util
 
-from src.backend.rotten_scores.rotten_scores.settings import MONGODB_URI, MONGODB_NAME
+from rotten_scores.settings import MONGODB_URI, MONGODB_NAME
 
 from . import forms
 
