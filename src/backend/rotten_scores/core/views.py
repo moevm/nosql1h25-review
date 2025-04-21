@@ -1,10 +1,18 @@
-from django.http import JsonResponse
 from django.views.generic import TemplateView
-from pymongo import MongoClient
+from django.shortcuts import render
 from django.conf import settings
 from datetime import datetime
 from django.views.generic.edit import FormView
 from django.contrib.auth import login, authenticate
+
+from django.http import JsonResponse
+
+from pymongo import MongoClient
+import json
+from bson import json_util
+
+from rotten_scores.settings import MONGODB_URI, MONGODB_NAME
+
 from . import forms
 
 
@@ -17,9 +25,9 @@ class HomepageView(TemplateView):
         # Подключение к MongoDB
         client = MongoClient(settings.MONGODB_URI)
         db = client[settings.MONGODB_NAME]
-        
+
         platform = self.request.GET.get('platform', 'PlayStation 5')
-        
+
         # Получение новых релизов
         new_releases_pipeline = [
             {"$project": {
@@ -28,7 +36,7 @@ class HomepageView(TemplateView):
                 "image_ref": "$imageUrl",
                 "releaseDate": 1,
                 "platforms": 1,
-                "avg_rating": "$stats.criticReviews.avgRating"  
+                "avg_rating": "$stats.criticReviews.avgRating"
             }},
             {"$sort": {"releaseDate": -1}},
             {"$limit": 6}
@@ -52,13 +60,12 @@ class HomepageView(TemplateView):
         ]
 
         best_platform_games = list(db.games.aggregate(best_platform_games_pipeline))
-        
+
         # Получение списка 5 популярных платформ
-        all_platforms = ['PlayStation 5', 'PlayStation 4', 'Xbox One', 'Xbox','iOS']
+        all_platforms = ['PlayStation 5', 'PlayStation 4', 'Xbox One', 'Xbox', 'iOS']
         # если хотим все платформы вывести
         # all_platforms = db.games.distinct("platforms")
         # all_platforms.sort()
-
 
         for game in new_releases + best_platform_games:
             game['id'] = str(game['_id'])
@@ -74,7 +81,6 @@ class HomepageView(TemplateView):
                 game['avg_rating_display'] = round(game['avg_rating'])
             else:
                 game['avg_rating_display'] = 0
-
 
         context.update({
             'new_releases': new_releases,
@@ -126,3 +132,21 @@ class LoginView(FormView):
                 'error': form.errors.get('__all__', ['Неверный username или пароль'])[0]
             }, status=400)
         return super().form_invalid(form)
+
+
+def database_view(request):
+    client = MongoClient(MONGODB_URI)
+
+    db = client[MONGODB_NAME]
+
+    collection_names = [name for name in db.list_collection_names() if not name.startswith('system.')]
+
+    all_data = {}
+    for collection_name in collection_names:
+        collection = db[collection_name]
+        documents = list(collection.find({}))
+
+        all_data[collection_name] = documents
+
+    client.close()
+    return render(request, "profile/db_viewer.html", {"json_str": json_util.dumps(all_data)})
