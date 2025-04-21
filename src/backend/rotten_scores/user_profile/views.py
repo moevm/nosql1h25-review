@@ -2,8 +2,6 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound
 from pymongo import MongoClient
 from django.conf import settings
-from .models import GameReview
-from datetime import datetime
 
 
 def my_ratings_and_reviews(request):
@@ -12,32 +10,30 @@ def my_ratings_and_reviews(request):
     user_id = request.user.id
 
     data = [
-  {
-    "$match": {"userId": user_id }
-  },
-  {
-    "$lookup": {
-      "from": "games",
-      "localField": "gameId",
-      "foreignField": "_id",
-      "as": "game_info"
-    }
-  },
-  {
-    "$project": {
-      "_id": 0,
-      "text": 1,
-      "rating": 1,
-      "createdAt": 1,
-      "game_info.title": 1,
-      "game_info.imageUrl": 1
-    }
-  }
-]
+          {
+            "$match": {"userId": user_id }
+          },
+          {
+            "$lookup": {
+              "from": "games",
+              "localField": "gameId",
+              "foreignField": "_id",
+              "as": "game_info"
+            }
+          },
+          {
+            "$project": {
+              "_id": 0,
+              "text": 1,
+              "rating": 1,
+              "createdAt": 1,
+              "game_info.title": 1,
+              "game_info.imageUrl": 1
+            }
+          }
+        ]
 
     reviews = list(db.user_reviews.aggregate(data))
-
-    print(reviews)
 
     context = {
         'reviews': reviews,
@@ -51,7 +47,6 @@ def custom_logout(request):
         # Получаем текущего пользователя и вызываем его метод logout
         user = request.user
         user.logout()
-
 
         # Очищаем сессию
         request.session.flush()
