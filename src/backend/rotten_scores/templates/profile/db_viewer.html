@@ -1,0 +1,20 @@
+<!-- templates/stats.html -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Interactive JSON Viewer{% endblock %}
+
+{% block content %}
+
+{% load static %}
+<script src="{% static 'js/json-formatter.umd.min.js' %}"></script>
+
+<div id="json-viewer"></div>
+<script>
+  // Parse JSON string (None → null)
+  const data = JSON.parse('{{ json_str|escapejs }}');
+  const formatter = new JSONFormatter(data, 1);
+  document.getElementById('json-viewer').appendChild(formatter.render());
+</script>
+
+{% endblock %}
