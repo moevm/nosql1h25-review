@@ -17,7 +17,7 @@ def game_list(request):
 #     return render(request, 'game_list.html', {'games': games, 'query': query})
 
 def game_detail(request, pk):
-    return HttpResponse("Заглушка детали игры")
+    return JsonResponse({'error': 'Not implemented'})
 
 logger = logging.getLogger(__name__)
 

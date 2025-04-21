@@ -16,23 +16,23 @@
         <!-- Поиск и кнопка -->
         <div style="display: flex; align-items: center; gap: 1.5rem;">
             <form method="get" action="{% url 'games:game_list' %}" style="position: relative;">
-            <input id="search-input" name="q" type="text" placeholder="Search"
-                style="width: 200px; padding: 0.5rem 2rem 0.5rem 0.75rem; border-radius: 0.25rem; border: none;">
-            <div id="search-results" style="position: absolute; background: white; width: 100%; z-index: 1000; display: none;"></div>
-            <img src="{% static 'img/search.png' %}" alt="Search"
-                style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px;">
+                <input id="search-input" name="q" type="text" placeholder="Search"
+                       style="width: 200px; padding: 0.5rem 2rem 0.5rem 0.75rem; border-radius: 0.25rem; border: none;">
+                <div id="search-results" style="position: absolute; background: white; width: 100%; z-index: 1000; display: none;"></div>
+                <img src="{% static 'img/search.png' %}" alt="Search"
+                     style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px;">
             </form>
 
             {% if user.is_authenticated %}
-                <div class="user-icon" style="cursor: pointer; position: relative;">
-                    <img src="{% static 'img/user.png' %}" alt="User" style="width: 32px; height: 32px; border-radius: 50%;">
-                    <div class="user-dropdown" style="display: none; position: absolute; right: 0; top: 100%; background-color: #1a1a1a; border-radius: 4px; width: 150px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 100; margin-top: 5px;">
-                        <div style="padding: 10px; border-bottom: 1px solid #333; text-align: center; font-weight: bold;">{{ user.username }}</div>
-                        <a href="{% url 'profile:my_rating_and_reviews' %}" style="display: block; padding: 10px; color: white; text-decoration: none;">Profile</a>
-                    </div>
+            <div class="user-icon" style="cursor: pointer; position: relative;">
+                <img src="{% static 'img/user.png' %}" alt="User" style="width: 32px; height: 32px; border-radius: 50%;">
+                <div class="user-dropdown" style="display: none; position: absolute; right: 0; top: 100%; background-color: #1a1a1a; border-radius: 4px; width: 150px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 100; margin-top: 5px;">
+                    <div style="padding: 10px; border-bottom: 1px solid #333; text-align: center; font-weight: bold;">{{ user.username }}</div>
+                    <a href="{% url 'profile:my_rating_and_reviews' %}" style="display: block; padding: 10px; color: white; text-decoration: none;">Profile</a>
                 </div>
+            </div>
             {% else %}
-                <button id="authButton" style="background-color: #FFBD3F; color: black; border: none; border-radius: 0.25rem; padding: 0.5rem 1.5rem; cursor: pointer; font-weight: bold; white-space: nowrap;">Authorization</button>
+            <button id="authButton" style="background-color: #FFBD3F; color: black; border: none; border-radius: 0.25rem; padding: 0.5rem 1.5rem; cursor: pointer; font-weight: bold; white-space: nowrap;">Authorization</button>
             {% endif %}
         </div>
     </div>
@@ -43,260 +43,251 @@
 
 <!-- JavaScript for modal functionality -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Modal functionality
-    const modal = document.getElementById('loginModal');
-    const authButton = document.getElementById('authButton');
-    const closeModal = document.querySelector('.close-modal');
-    const loginForm = document.getElementById('loginForm');
+    document.addEventListener('DOMContentLoaded', function () {
+        // Modal functionality
+        const modal = document.getElementById('loginModal');
+        const authButton = document.getElementById('authButton');
+        const closeModal = document.querySelector('.close-modal');
+        const loginForm = document.getElementById('loginForm');
 
 
 
-    // Open modal when clicking the auth button
-    if (authButton) {
-        authButton.addEventListener('click', function() {
-            modal.style.display = 'block';
-        });
-    }
-
-    // Close modal when clicking the X
-    if (closeModal) {
-        closeModal.addEventListener('click', function() {
-            modal.style.display = 'none';
-        });
-    }
-
-    // Close modal when clicking outside of it
-    window.addEventListener('click', function(event) {
-        if (event.target === modal) {
-            modal.style.display = 'none';
+        // Open modal when clicking the auth button
+        if (authButton) {
+            authButton.addEventListener('click', function () {
+                modal.style.display = 'block';
+            });
         }
-    });
 
-    // Handle form submission with AJAX
-    if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+        // Close modal when clicking the X
+        if (closeModal) {
+            closeModal.addEventListener('click', function () {
+                modal.style.display = 'none';
+            });
+        }
 
-            // Reset error messages
-            document.getElementById('username-error').textContent = '';
-            document.getElementById('password-error').textContent = '';
-            document.getElementById('form-error').textContent = '';
-
-            const formData = new FormData(loginForm);
-            const xhr = new XMLHttpRequest();
-
-            xhr.open('POST', loginForm.action, true);
-            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    const response = JSON.parse(xhr.responseText);
-                    if (response.success) {
-                        // Reload the page to update the UI with the logged-in user
-                        window.location.reload();
-                    }
-                } else {
-                    // Handle errors
-                    try {
-                        const response = JSON.parse(xhr.responseText);
-                        if (response.error) {
-                            document.getElementById('form-error').textContent = response.error;
-                        }
-                    } catch (e) {
-                        document.getElementById('form-error').textContent = 'An error occurred. Please try again.';
-                    }
-                }
-            };
-
-            xhr.onerror = function() {
-                document.getElementById('form-error').textContent = 'Network error. Please try again.';
-            };
-
-            xhr.send(formData);
-        });
-    }
-
-    // User dropdown menu functionality
-    const userIcon = document.querySelector('.user-icon');
-    const userDropdown = document.querySelector('.user-dropdown');
-
-    if (userIcon && userDropdown) {
-        userIcon.addEventListener('click', function(e) {
-            e.stopPropagation();
-            if (userDropdown.style.display === 'block') {
-                userDropdown.style.display = 'none';
-            } else {
-                userDropdown.style.display = 'block';
+        // Close modal when clicking outside of it
+        window.addEventListener('click', function (event) {
+            if (event.target === modal) {
+                modal.style.display = 'none';
             }
         });
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function() {
-            userDropdown.style.display = 'none';
-        });
+        // Handle form submission with AJAX
+        if (loginForm) {
+            loginForm.addEventListener('submit', function (e) {
+                e.preventDefault();
 
-        // Prevent closing when clicking inside dropdown
-        userDropdown.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-    }
+                // Reset error messages
+                document.getElementById('username-error').textContent = '';
+                document.getElementById('password-error').textContent = '';
+                document.getElementById('form-error').textContent = '';
 
-// Real-time search suggestions
-<!--const searchInput = document.getElementById('search-input');-->
-<!--const searchResults = document.getElementById('search-results');-->
+                const formData = new FormData(loginForm);
+                const xhr = new XMLHttpRequest();
 
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('search-input');
-    const searchResults = document.getElementById('search-results');
-    const searchUrl = searchInput ? searchInput.dataset.searchUrl : '';
+                xhr.open('POST', loginForm.action, true);
+                xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            // Reload the page to update the UI with the logged-in user
+                            window.location.reload();
+                        }
+                    } else {
+                        // Handle errors
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.error) {
+                                document.getElementById('form-error').textContent = response.error;
+                            }
+                        } catch (e) {
+                            document.getElementById('form-error').textContent = 'An error occurred. Please try again.';
+                        }
+                    }
+                };
+
+                xhr.onerror = function () {
+                    document.getElementById('form-error').textContent = 'Network error. Please try again.';
+                };
+
+                xhr.send(formData);
+            });
+        }
+
+        // User dropdown menu functionality
+        const userIcon = document.querySelector('.user-icon');
+        const userDropdown = document.querySelector('.user-dropdown');
+
+        if (userIcon && userDropdown) {
+            userIcon.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (userDropdown.style.display === 'block') {
+                    userDropdown.style.display = 'none';
+                } else {
+                    userDropdown.style.display = 'block';
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function () {
+                userDropdown.style.display = 'none';
+            });
+
+            // Prevent closing when clicking inside dropdown
+            userDropdown.addEventListener('click', function (e) {
+                e.stopPropagation();
+            });
+        }
+
+        // Real-time search suggestions
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
 
         if (searchInput && searchResults) {
-        searchInput.addEventListener('input', function () {
-            const query = this.value.trim();
+            searchInput.addEventListener('input', function () {
+                const query = this.value.trim();
 
-            if (query.length === 0) {
-                searchResults.innerHTML = '';
-                searchResults.style.display = 'none';
-                return;
-            }
-
-            fetch(`{% url 'games:search_games' %}?q=${encodeURIComponent(query)}`)
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Search results:', data);
+                if (query.length === 0) {
                     searchResults.innerHTML = '';
+                    searchResults.style.display = 'none';
+                    return;
+                }
 
-                    // Ширина результатов на 100px больше ширины поля ввода
-                    searchResults.style.width = (searchInput.offsetWidth + 100) + 'px';
+                fetch(`/games/search/?q=${encodeURIComponent(query)}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Search results:', data);
+                        searchResults.innerHTML = '';
 
-                    if (data.length > 0) {
-                        data.forEach(game => {
-                            const li = document.createElement('li');
-                            // Оптимальные размеры карточки
-                            li.style.cssText = `
-                                padding: 12px 15px;
-                                border-bottom: 1px solid #eee;
-                                cursor: pointer;
-                                background-color: white;
-                                min-height: 85px;
-                                box-sizing: border-box;
+                        // Ширина результатов на 100px больше ширины поля ввода
+                        searchResults.style.width = (searchInput.offsetWidth + 100) + 'px';
+
+                        if (data.length > 0) {
+                            data.forEach(game => {
+                                const li = document.createElement('li');
+                                // Оптимальные размеры карточки
+                                li.style.cssText = `
+                            padding: 12px 15px;
+                            border-bottom: 1px solid #eee;
+                            cursor: pointer;
+                            background-color: white;
+                            min-height: 85px;
+                            box-sizing: border-box;
+                            display: flex;
+                            align-items: center;
+                        `;
+
+                                // Оптимальное количество символов (40)
+                                const maxLength = 40;
+                                const displayTitle = game.title.length > maxLength
+                                    ? game.title.substring(0, maxLength) + '..'
+                                    : game.title;
+
+                                // Форматируем дату (предполагаем, что бекенд уже вернул в нужном формате)
+                                const formattedDate = game.releaseDate || 'N/A';
+
+                                li.innerHTML = `
+                            <div style="
                                 display: flex;
                                 align-items: center;
-                            `;
-
-                            // Оптимальное количество символов (40)
-                            const maxLength = 40;
-                            const displayTitle = game.title.length > maxLength
-                                ? game.title.substring(0, maxLength) + '..'
-                                : game.title;
-
-                            // Форматируем дату (предполагаем, что бекенд уже вернул в нужном формате)
-                            const formattedDate = game.releaseDate || 'N/A';
-
-                            li.innerHTML = `
+                                gap: 15px;
+                                width: 100%;
+                                height: 100%;
+                            ">
+                                <img src="${game.imageUrl || '#'}" alt="${game.title}"
+                                     style="
+                                         width: 55px;
+                                         height: 70px;
+                                         object-fit: cover;
+                                         flex-shrink: 0;
+                                     ">
                                 <div style="
+                                    flex: 1;
+                                    min-width: 0;
                                     display: flex;
-                                    align-items: center;
-                                    gap: 15px;
-                                    width: 100%;
-                                    height: 100%;
+                                    flex-direction: column;
+                                    justify-content: center;
                                 ">
-                                    <img src="${game.imageUrl || '#'}" alt="${game.title}"
-                                         style="
-                                             width: 55px;
-                                             height: 70px;
-                                             object-fit: cover;
-                                             flex-shrink: 0;
-                                         ">
                                     <div style="
-                                        flex: 1;
-                                        min-width: 0;
+                                        font-weight: bold;
+                                        color: black;
+                                        font-size: 15px;
+                                        white-space: nowrap;
+                                        overflow: hidden;
+                                        text-overflow: ellipsis;
+                                        margin-bottom: 5px;
+                                        width: 100%;
+                                    " title="${game.title}">
+                                        ${displayTitle}
+                                    </div>
+                                    <div style="
                                         display: flex;
-                                        flex-direction: column;
-                                        justify-content: center;
+                                        justify-content: space-between;
+                                        align-items: center;
+                                        width: 100%;
                                     ">
                                         <div style="
+                                            font-size: 13px;
+                                            color: #666;
+                                        ">
+                                            ${formattedDate}
+                                        </div>
+                                        <div style="
+                                            font-size: 16px;
                                             font-weight: bold;
-                                            color: black;
-                                            font-size: 15px;
-                                            white-space: nowrap;
-                                            overflow: hidden;
-                                            text-overflow: ellipsis;
-                                            margin-bottom: 5px;
-                                            width: 100%;
-                                        " title="${game.title}">
-                                            ${displayTitle}
-                                        </div>
-                                        <div style="
-                                            display: flex;
-                                            justify-content: space-between;
-                                            align-items: center;
-                                            width: 100%;
+                                            color: #333;
+                                            margin-left: 10px;
                                         ">
-                                            <div style="
-                                                font-size: 13px;
-                                                color: #666;
-                                            ">
-                                                ${formattedDate}
-                                            </div>
-                                            <div style="
-                                                font-size: 16px;
-                                                font-weight: bold;
-                                                color: #333;
-                                                margin-left: 10px;
-                                            ">
-                                                ${game.criticRating || 'N/A'}
-                                            </div>
-                                        </div>
-                                        <div style="
-                                            font-size: 12px;
-                                            color: #888;
-                                            margin-top: 3px;
-                                        ">
-                                            ${game.genres || 'Genre not specified'} | ${game.platforms || ''}
+                                            ${game.criticRating || 'N/A'}
                                         </div>
                                     </div>
+                                    <div style="
+                                        font-size: 12px;
+                                        color: #888;
+                                        margin-top: 3px;
+                                    ">
+                                        ${game.genres || 'Genre not specified'} | ${game.platforms || ''}
+                                    </div>
                                 </div>
-                            `;
+                            </div>
+                        `;
 
-                            li.addEventListener('click', () => {
-                                window.location.href = `/games/${game.id}/`;
+                                li.addEventListener('mouseenter', () => {
+                                    li.style.backgroundColor = '#f5f5f5';
+                                });
+
+                                li.addEventListener('mouseleave', () => {
+                                    li.style.backgroundColor = 'white';
+                                });
+
+                                searchResults.appendChild(li);
                             });
-
-                            li.addEventListener('mouseenter', () => {
-                                li.style.backgroundColor = '#f5f5f5';
-                            });
-
-                            li.addEventListener('mouseleave', () => {
-                                li.style.backgroundColor = 'white';
-                            });
-
-                            searchResults.appendChild(li);
-                        });
+                            searchResults.style.display = 'block';
+                        } else {
+                            searchResults.innerHTML = '<li style="padding: 12px 15px; color: black; min-height: 60px; display: flex; align-items: center;">No results found</li>';
+                            searchResults.style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Search error:', error);
+                        searchResults.innerHTML = '<li style="padding: 12px 15px; color: black; min-height: 60px; display: flex; align-items: center;">Error loading results</li>';
                         searchResults.style.display = 'block';
-                    } else {
-                        searchResults.innerHTML = '<li style="padding: 12px 15px; color: black; min-height: 60px; display: flex; align-items: center;">No results found</li>';
-                        searchResults.style.display = 'block';
-                    }
-                })
-                .catch(error => {
-                    console.error('Search error:', error);
-                    searchResults.innerHTML = '<li style="padding: 12px 15px; color: black; min-height: 60px; display: flex; align-items: center;">Error loading results</li>';
-                    searchResults.style.display = 'block';
-                });
-        });
+                    });
+            });
 
-        document.addEventListener('click', function (e) {
-            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
-                searchResults.style.display = 'none';
-            }
-        });
-    }
-});
+            document.addEventListener('click', function (e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+        }
+    });
 </script>
 
 
