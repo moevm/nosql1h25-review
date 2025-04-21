@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
 from .models import Game
@@ -6,6 +5,14 @@ import logging
 from pymongo import MongoClient
 from django.conf import settings
 from datetime import datetime
+from django.views.generic import TemplateView
+import sys
+import os
+from django.shortcuts import render, get_object_or_404
+from bson.objectid import ObjectId
+
+client = MongoClient(settings.MONGODB_URI)
+db = client[settings.MONGODB_NAME]
 
 def game_list(request):
     return HttpResponse("Заглушка лист игр")
@@ -17,14 +24,25 @@ def game_list(request):
 #     return render(request, 'game_list.html', {'games': games, 'query': query})
 
 def game_detail(request, pk):
-    return JsonResponse({'error': 'Not implemented'})
+    try:
+        game = db.games.find_one({'_id': ObjectId(pk)})
+    except Exception:
+        game = None
+
+    if not game:
+        return render(request, '404.html', status=404)
+
+    game['id'] = str(game['_id'])
+
+    if 'releaseDate' in game and isinstance(game['releaseDate'], datetime):
+        game['release_date_formatted'] = game['releaseDate'].strftime('%Y-%m-%d')
+
+    return render(request, 'games/game_detail.html', {'game': game})
 
 logger = logging.getLogger(__name__)
 
 def search_games(request):
     try:
-        client = MongoClient(settings.MONGODB_URI)
-        db = client[settings.MONGODB_NAME]
         query = request.GET.get('q', '').strip().lower()
 
         if not query or 'games' not in db.list_collection_names():

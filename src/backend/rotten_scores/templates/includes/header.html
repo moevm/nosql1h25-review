@@ -257,6 +257,9 @@
                                 </div>
                             </div>
                         `;
+                                li.addEventListener('click', () => {
+                                    window.location.href = `/games/${game.id}/`;
+                                });
 
                                 li.addEventListener('mouseenter', () => {
                                     li.style.backgroundColor = '#f5f5f5';
