@@ -3,6 +3,8 @@ from django.http import HttpResponse, HttpResponseNotFound
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from pymongo import MongoClient
+from django.conf import settings
 from .forms import ChangePersonalDataForm, ChangePasswordForm
 
 
@@ -63,9 +65,47 @@ def account(request):
 
     return render(request, 'profile/base_profile.html', context)
 
-
 def statistics(request):
-    return HttpResponse("Заглушка")
+    user_id = request.user.id
+ 
+    client = MongoClient(settings.MONGODB_URI)
+    db = client[settings.MONGODB_NAME]
+
+    user_reviews = list(db.user_reviews.find({"userId": user_id}))
+    games_reviewed = len(user_reviews)
+
+    if games_reviewed == 0:
+        context = {
+            'games_reviewed': 0,
+            'favourite_platform': 'None',
+            'favourite_genre': 'None',
+        }
+        return render(request, 'profile/base_profile.html', context)
+
+    platform_counter = {}
+    genre_counter = {}
+    # TODO исправить получение платформы 
+    for review in user_reviews:
+        platform = review.get("platform")
+        if platform:
+            platform_counter[platform] = platform_counter.get(platform, 0) + 1
+
+        game = db.games.find_one({"_id": review["gameId"]})
+        if game:
+            for genre in game.get("genres", []):
+                genre_counter[genre] = genre_counter.get(genre, 0) + 1
+
+    favourite_platform = max(platform_counter, key=platform_counter.get, default='None')
+    favourite_genre = max(genre_counter, key=genre_counter.get, default='None')
+
+    context = {
+        'games_reviewed': games_reviewed,
+        'favourite_platform': favourite_platform,
+        'favourite_genre': favourite_genre,
+    }
+
+    return render(request, 'profile/base_profile.html', context)
+
 
 def admin_panel(request):
     return HttpResponse("Заглушка")
