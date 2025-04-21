@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models, DatabaseError
 from django.utils import timezone
 from django.contrib.auth.hashers import make_password, check_password
-from djongo.models import ObjectIdField
 
 
 class CustomUserManager(BaseUserManager):

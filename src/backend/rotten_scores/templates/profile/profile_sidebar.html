@@ -114,10 +114,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 .then(response => response.text())
                 .then(html => {
                     mainContent.innerHTML = html;
+
+                    // Добавляем в историю новое состояние и меняем URL
+                    history.pushState({ section }, '', `/profile/${section}/`);
                 })
                 .catch(error => {
                     console.error('Error loading section:', error);
                 });
+
         });
     });
 });
