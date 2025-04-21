@@ -41,8 +41,8 @@ def load_section(request):
 
 
 def account(request):
-    personal_form = ChangePersonalDataForm(user=request.user)
-    password_form = ChangePasswordForm(user=request.user)
+    personal_form = ChangePersonalDataForm(data=request.POST, user=request.user)
+    password_form = ChangePasswordForm(data=request.POST, user=request.user)
 
     if request.method == 'POST':
         if 'form_type' in request.POST:
@@ -61,7 +61,7 @@ def account(request):
         'password_form': password_form,
     }
 
-    return render(request, 'profile/sections/account.html', context)
+    return render(request, 'profile/base_profile.html', context)
 
 
 def statistics(request):

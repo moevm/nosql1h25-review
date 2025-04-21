@@ -1,6 +1,5 @@
 from django import forms
-import re
-from django.core.validators import MinLengthValidator, RegexValidator
+from django.core.validators import MinLengthValidator
 from pymongo import MongoClient
 from django.conf import settings
 from django.core.exceptions import ValidationError
