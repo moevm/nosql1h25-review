@@ -10,7 +10,6 @@ urlpatterns = [
     path('', include(('core.urls', 'core'), namespace='core')),
     path('profile/', include(('user_profile.urls', 'user_profile'), namespace='user_profile')),
     path('games/', include(('games.urls', 'games'), namespace='games')),
-    path('games/', include('games.urls')),
     path('reviews/', include(('reviews.urls', 'reviews'), namespace='reviews')),
 ]
 

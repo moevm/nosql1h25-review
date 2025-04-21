@@ -8,19 +8,18 @@ from django.conf import settings
 from datetime import datetime
 
 def game_list(request):
-    # return HttpResponse("Заглушка лист игр")
-    query = request.GET.get('q', '')
-    if query:
-        games = Game.objects.filter(title__icontains=query)
-    else:
-        games = Game.objects.all()
-    return render(request, 'game_list.html', {'games': games, 'query': query})
+    return HttpResponse("Заглушка лист игр")
+#     query = request.GET.get('q', '')
+#     if query:
+#         games = Game.objects.filter(title__icontains=query)
+#     else:
+#         games = Game.objects.all()
+#     return render(request, 'game_list.html', {'games': games, 'query': query})
 
-def game_detail(request):
+def game_detail(request, pk):
     return HttpResponse("Заглушка детали игры")
 
 logger = logging.getLogger(__name__)
-
 
 def search_games(request):
     try:
