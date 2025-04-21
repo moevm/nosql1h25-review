@@ -1,13 +1,45 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound
-from django.views.generic import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
-from .forms import ChangePersonalDataForm, ChangePasswordForm
+from pymongo import MongoClient
+from django.conf import settings
 
 
-def my_rating_and_reviews(request):
-    return render(request, 'profile/base_profile.html')
+def my_ratings_and_reviews(request):
+    client = MongoClient(settings.MONGODB_URI)
+    db = client[settings.MONGODB_NAME]
+    user_id = request.user.id
+
+    data = [
+          {
+            "$match": {"userId": user_id }
+          },
+          {
+            "$lookup": {
+              "from": "games",
+              "localField": "gameId",
+              "foreignField": "_id",
+              "as": "game_info"
+            }
+          },
+          {
+            "$project": {
+              "_id": 0,
+              "text": 1,
+              "rating": 1,
+              "createdAt": 1,
+              "game_info.title": 1,
+              "game_info.imageUrl": 1
+            }
+          }
+        ]
+
+    reviews = list(db.user_reviews.aggregate(data))
+
+    context = {
+        'reviews': reviews,
+    }
+
+    return render(request, 'profile/base_profile.html', context)
 
 
 def custom_logout(request):
@@ -38,7 +70,6 @@ def load_section(request):
         return render(request, template_name)
     except:
         return HttpResponseNotFound("Section not found")
-
 
 def account(request):
     personal_form = ChangePersonalDataForm(data=request.POST, user=request.user)
