@@ -1,5 +1,25 @@
-<h2>My Rating & Reviews</h2>
-<div class="ratings-content">
-    <!-- Контент рейтингов -->
-    <p>Your reviews and ratings</p>
+<div style="display: flex; flex-wrap: wrap; flex-direction: row-reverse; justify-content: flex-end; gap: 1rem; padding: 1rem;">
+    {% for review in reviews %}
+    <div style="background-color: #1a1a1a; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); padding: 1rem; width: 600px; display: flex; flex-direction: column; gap: 0.75rem; color: white;">
+        <div style="display: flex; gap: 1rem;">
+            <img src="{{ review.game_info.0.imageUrl }}" alt="Game Image" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+            <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <h2 style="margin: 0; font-size: 1.2rem;">{{ review.game_info.0.title }}</h2>
+                    <p style="margin: 0.25rem 0; color: #aaaaaa; font-size: 0.9rem;">Reviewed – {{ review.createdAt|date:"M d, Y" }}</p>
+                </div>
+                <div>
+                    <span style="background-color: #4CAF50; color: black; font-weight: bold; padding: 0.3rem 0.8rem; border-radius: 6px;">{{ review.rating }}</span>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+                <button style="background-color: #FF4D4D; color: black; border: none; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">Удалить</button>
+                <button style="background-color: #FFBD3F; color: black; border: none; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">Изменить</button>
+            </div>
+        </div>
+        <div style="margin-top: 0.5rem; color: #dddddd; font-size: 0.95rem; line-height: 1.4;">
+            {{ review.text|linebreaksbr }}
+        </div>
+    </div>
+    {% endfor %}
 </div>
