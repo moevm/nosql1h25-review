@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound
 from pymongo import MongoClient
 from django.conf import settings
+from user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
 
 
 def my_ratings_and_reviews(request):
@@ -71,6 +72,7 @@ def load_section(request):
     except:
         return HttpResponseNotFound("Section not found")
 
+
 def account(request):
     personal_form = ChangePersonalDataForm(data=request.POST, user=request.user)
     password_form = ChangePasswordForm(data=request.POST, user=request.user)
@@ -94,6 +96,7 @@ def account(request):
 
     return render(request, 'profile/base_profile.html', context)
 
+
 def statistics(request):
     user_id = request.user.id
 
@@ -113,7 +116,7 @@ def statistics(request):
 
     platform_counter = {}
     genre_counter = {}
-    # TODO исправить получение платформы
+    # TODO исправить получение платформы и жанра
     for review in user_reviews:
         platform = review.get("platform")
         if platform:
