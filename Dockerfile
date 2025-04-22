@@ -7,6 +7,7 @@ RUN apk add --no-cache \
   py3-setuptools \
   py3-pip \
   libffi-dev \
+  mongodb-tools \
   && pip install --upgrade pip
 
 COPY requirements.txt /app/requirements.txt
@@ -18,7 +19,10 @@ COPY . /app
 
 RUN mkdir -p /app/backend/rotten_scores/static_dev /app/backend/rotten_scores/templates
 
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 RUN addgroup -S notroot && adduser -S imnotroot -G notroot
 USER imnotroot
 
-CMD python src/backend/rotten_scores/manage.py migrate && python src/backend/rotten_scores/manage.py runserver
+ENTRYPOINT ["/entrypoint.sh"]

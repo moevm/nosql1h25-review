@@ -4,16 +4,16 @@ services:
     container_name: mongodb
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_ROOT_PASSWORD: root
       MONGO_INITDB_DATABASE: game_reviews_db
-    volumes:
-      - mongodb_data:/data/db
     ports:
       - "27017:27017"
     restart: unless-stopped
     networks:
       - app-network
-
+    volumes:
+      - ./backup:/backup
+      - ./mongo-init:/docker-entrypoint-initdb.d
 
   django-app:
     build: .
@@ -21,19 +21,16 @@ services:
     volumes:
       - .:/app
     ports:
-      - "8000:8000"
+      - "8080:8080"
     environment:
       - DJANGO_SETTINGS_MODULE=rotten_scores.settings
       - MONGO_DB_NAME=game_reviews_db
       - MONGO_DB_USER=root
-      - MONGO_DB_PASSWORD=example
+      - MONGO_DB_PASSWORD=root
       - MONGO_DB_HOST=mongodb
       - MONGO_DB_PORT=27017
     networks:
       - app-network
-
-volumes:
-  mongodb_data: {}
 
 networks:
   app-network:
