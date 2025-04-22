@@ -11,8 +11,8 @@ import os
 from django.shortcuts import render, get_object_or_404
 from bson.objectid import ObjectId
 
-client = MongoClient(settings.MONGODB_URI)
-db = client[settings.MONGODB_NAME]
+client = MongoClient(settings.MONGO_DB_URI)
+db = client[settings.MONGO_DB_NAME]
 
 def game_list(request):
     return HttpResponse("Заглушка лист игр")

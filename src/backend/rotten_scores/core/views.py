@@ -11,7 +11,7 @@ from pymongo import MongoClient
 import json
 from bson import json_util
 
-from rotten_scores.settings import MONGODB_URI, MONGODB_NAME
+from rotten_scores.settings import MONGO_DB_URI, MONGO_DB_NAME
 
 from . import forms
 
@@ -23,8 +23,8 @@ class HomepageView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         # Подключение к MongoDB
-        client = MongoClient(settings.MONGODB_URI)
-        db = client[settings.MONGODB_NAME]
+        client = MongoClient(settings.MONGO_DB_URI)
+        db = client[settings.MONGO_DB_NAME]
 
         platform = self.request.GET.get('platform', 'PlayStation 5')
 
