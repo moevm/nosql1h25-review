@@ -1,5 +1,27 @@
-<h2>Statistics</h2>
-<div class="stats-content">
-    <!-- Статистика -->
-    <p>Your statistics</p>
-</div>
+<h2 class="mb-4">Statistics</h2>
+{% if user.role == 'user' %}
+    <div class="container text-center py-5">
+        <div class="row justify-content-center mb-3">
+            <div class="col-4 col-md-3">
+                <h2 style="color: #FFBD3F;">{{ games_reviewed|default:"1" }}</h2>
+                <p class="text-muted small">Games reviewed</p>
+            </div>
+            <div class="col-4 col-md-3">
+                <h2 style="color: #FFBD3F;">{{ favourite_platform|default:"PS4" }}</h2>
+                <p class="text-muted small">Favourite Platform</p>
+            </div>
+            <div class="col-4 col-md-3">
+                <h2 style="color: #FFBD3F;">{{ favourite_genre|default:"Adventure" }}</h2>
+                <p class="text-muted small">Favourite Genre</p>
+            </div>
+        </div>
+
+        {% if games_reviewed == 0 %}
+        <div class="alert alert-info mt-4">
+            You haven't reviewed any games yet. Start rating to see your stats here!
+        </div>
+        {% endif %}
+    </div>
+{% else %}
+    <h5>Для данной роли статистика не предусмотрена.</h5>
+{% endif %}
