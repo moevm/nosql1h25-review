@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mongodb:
     image: mongo:6.0
@@ -7,7 +5,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
-      MONGO_INITDB_DATABASE: rotten_scores
+      MONGO_INITDB_DATABASE: game_reviews_db
     volumes:
       - mongodb_data:/data/db
     ports:
@@ -15,6 +13,7 @@ services:
     restart: unless-stopped
     networks:
       - app-network
+
 
   django-app:
     build: .
@@ -25,26 +24,17 @@ services:
       - "8000:8000"
     environment:
       - DJANGO_SETTINGS_MODULE=rotten_scores.settings
-      - MONGO_DB_NAME=rotten_scores
+      - MONGO_DB_NAME=game_reviews_db
       - MONGO_DB_USER=root
       - MONGO_DB_PASSWORD=example
       - MONGO_DB_HOST=mongodb
       - MONGO_DB_PORT=27017
-    depends_on:
-      mongodb:
-        condition: service_healthy
     networks:
       - app-network
 
 volumes:
-  mongodb_data:
+  mongodb_data: {}
 
 networks:
   app-network:
     driver: bridge
-
-healthcheck:
-  test: mongosh --eval "db.adminCommand('ping')"
-  interval: 5s
-  timeout: 30s
-  retries: 3

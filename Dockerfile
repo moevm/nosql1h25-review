@@ -1,11 +1,12 @@
 FROM python:3.11-alpine
 LABEL authors="sofiavovchenko"
 
-RUN apt-get update && apt-get install -y \
-  build-essential \
+RUN apk add --no-cache \
+  build-base \
   python3-dev \
-  python3-pip \
-  python3-setuptools \
+  py3-setuptools \
+  py3-pip \
+  libffi-dev \
   && pip install --upgrade pip
 
 COPY requirements.txt /app/requirements.txt
@@ -17,7 +18,7 @@ COPY . /app
 
 RUN mkdir -p /app/backend/rotten_scores/static_dev /app/backend/rotten_scores/templates
 
-RUN groupadd --system notroot && useradd --system --create-home --gid notroot imnotroot
+RUN addgroup -S notroot && adduser -S imnotroot -G notroot
 USER imnotroot
 
 CMD python src/backend/rotten_scores/manage.py migrate && python src/backend/rotten_scores/manage.py runserver
