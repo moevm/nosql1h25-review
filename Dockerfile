@@ -1,17 +1,17 @@
-FROM python:3.11-slim
+FROM python:3.11-alpine
 LABEL authors="sofiavovchenko"
 
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    python3-dev \
-    python3-pip \
-    python3-setuptools \
-    && pip install --upgrade pip
+  build-essential \
+  python3-dev \
+  python3-pip \
+  python3-setuptools \
+  && pip install --upgrade pip
 
 COPY requirements.txt /app/requirements.txt
 WORKDIR /app
 RUN pip install --no-cache-dir -r requirements.txt
-EXPOSE 8000:8000
+EXPOSE 8000
 
 COPY . /app
 
