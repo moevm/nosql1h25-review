@@ -6,8 +6,8 @@ from user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
 
 
 def my_ratings_and_reviews(request):
-    client = MongoClient(settings.MONGODB_URI)
-    db = client[settings.MONGODB_NAME]
+    client = MongoClient(settings.MONGO_DB_URI)
+    db = client[settings.MONGO_DB_NAME]
     user_id = request.user.id
 
     data = [
@@ -100,8 +100,8 @@ def account(request):
 def statistics(request):
     user_id = request.user.id
 
-    client = MongoClient(settings.MONGODB_URI)
-    db = client[settings.MONGODB_NAME]
+    client = MongoClient(settings.MONGO_DB_URI)
+    db = client[settings.MONGO_DB_NAME]
 
     user_reviews = list(db.user_reviews.find({"userId": user_id}))
     games_reviewed = len(user_reviews)

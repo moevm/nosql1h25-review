@@ -55,8 +55,8 @@ class ChangePersonalDataForm(forms.Form):
         email = self.cleaned_data.get('email', self.user.email)
 
         try:
-            client = MongoClient(settings.MONGODB_URI)
-            db = client[settings.MONGODB_NAME]
+            client = MongoClient(settings.MONGO_DB_URI)
+            db = client[settings.MONGO_DB_NAME]
 
             result = db.users.update_one(
                 {'_id': self.user.id},
@@ -113,8 +113,8 @@ class ChangePasswordForm(forms.Form):
         new_password = self.cleaned_data['new_password']
 
         try:
-            client = MongoClient(settings.MONGODB_URI)
-            db = client[settings.MONGODB_NAME]
+            client = MongoClient(settings.MONGO_DB_URI)
+            db = client[settings.MONGO_DB_NAME]
 
             result = db.users.update_one(
                 {'_id': self.user.id},

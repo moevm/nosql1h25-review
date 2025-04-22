@@ -59,9 +59,6 @@ AUTHENTICATION_BACKENDS = [
 
 
 ROOT_URLCONF = 'rotten_scores.urls'
-# MongoDB настройки
-MONGODB_URI = 'mongodb://localhost:27017/'
-MONGODB_NAME = 'game_reviews_db'
 
 TEMPLATES = [
     {
@@ -91,16 +88,32 @@ LOGIN_REDIRECT_URL = '/'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+import os
+
+# MongoDB Configuration
+MONGO_DB_NAME = os.environ.get('MONGO_DB_NAME', 'game_reviews_db')  # default if not set
+MONGO_DB_USER = os.environ.get('MONGO_DB_USER', '')
+MONGO_DB_PASSWORD = os.environ.get('MONGO_DB_PASSWORD', '')
+MONGO_DB_HOST = os.environ.get('MONGO_DB_HOST', 'localhost')  # matches compose service name
+MONGO_DB_PORT = int(os.environ.get('MONGO_DB_PORT', '27017'))  # convert to int
+if MONGO_DB_USER != '' and MONGO_DB_PASSWORD != '':
+    MONGO_DB_URI = f'mongodb://{MONGO_DB_USER}:{MONGO_DB_PASSWORD}@{MONGO_DB_HOST}:{MONGO_DB_PORT}'
+else:
+    MONGO_DB_URI = f'mongodb://localhost:27017'
+
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': MONGODB_NAME,
+        'NAME': MONGO_DB_NAME,
         'CLIENT': {
-            'host': MONGODB_URI,
+            'host': MONGO_DB_URI,
+            # 'username': MONGO_DB_USER,
+            # 'password': MONGO_DB_PASSWORD,
+            # 'authSource': 'admin',
+            # 'authMechanism': 'SCRAM-SHA-1',
         }
     }
 }
-
 
 
 # Password validation
