@@ -14,7 +14,9 @@ class ChangePersonalDataForm(forms.Form):
         required=False,
         widget=forms.TextInput(attrs={
             "class": "login-input"
-        })
+        }),
+        help_text="Input new username.",
+
     )
     email = forms.EmailField(
         label="Email",
@@ -22,6 +24,7 @@ class ChangePersonalDataForm(forms.Form):
         widget=forms.EmailInput(attrs={
             "class": "login-input"
         }),
+        help_text="Input new email.",
     )
 
     def __init__(self, *args, **kwargs):
@@ -95,10 +98,13 @@ class ChangePasswordForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        print(cleaned_data)
         current_password = cleaned_data.get('current_password')
         new_password = cleaned_data.get('new_password')
         confirm_password = cleaned_data.get('new_password')
+
+        if current_password and self.user:
+            if not self.user.check_password(current_password):
+                self.add_error('current_password', "Current password is incorrect.")
 
         if new_password and confirm_password and new_password != confirm_password:
             self.add_error('confirm_password', "Passwords do not match.")
