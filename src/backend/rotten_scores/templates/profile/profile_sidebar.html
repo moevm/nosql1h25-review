@@ -11,7 +11,7 @@
                 <div class="menu-item" data-section="statistics">Statistics</div>
 
                 {% if user.role == 'admin' %}
-                <div class="menu-item" data-section="admin">Admin</div>
+                <div class="menu-item" data-section="admin_panel">Admin</div>
                 {% endif %}
             </div>
             <div class="sign-out-spacer"></div>
@@ -99,30 +99,55 @@ document.addEventListener('DOMContentLoaded', function() {
     const menuItems = document.querySelectorAll('.menu-item[data-section]');
     const mainContent = document.getElementById('main-content');
 
+    const sectionRoutes = {
+        ratings: '/profile/ratings/',
+        account: '/profile/account/',
+        statistics: '/profile/statistics/',
+        admin_panel: '/profile/admin_panel/',
+    };
+
+    function updateActive(section) {
+        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+        const target = document.querySelector(`.menu-item[data-section="${section}"]`);
+        if (target) target.classList.add('active');
+    }
+
+    function loadSection(section) {
+        const url = sectionRoutes[section] || sectionRoutes['ratings'];
+
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newContent = doc.getElementById('main-content');
+
+                if (newContent) {
+                    mainContent.innerHTML = newContent.innerHTML;
+                    history.pushState({ section }, '', url);
+                    updateActive(section);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading section:', error);
+            });
+    }
+
     menuItems.forEach(item => {
         item.addEventListener('click', function(e) {
             e.preventDefault();
-
-            document.querySelectorAll('.menu-item').forEach(i => {
-                i.classList.remove('active');
-            });
-
-            this.classList.add('active');
-
             const section = this.getAttribute('data-section');
-            fetch(`/profile/load_section/?section=${section}`)
-                .then(response => response.text())
-                .then(html => {
-                    mainContent.innerHTML = html;
-
-                    // Добавляем в историю новое состояние и меняем URL
-                    history.pushState({ section }, '', `/profile/${section}/`);
-                })
-                .catch(error => {
-                    console.error('Error loading section:', error);
-                });
-
+            loadSection(section);
         });
     });
+
+    const initialPath = window.location.pathname;
+    if (initialPath === '/profile/') {
+        const defaultSection = 'ratings';
+        const defaultUrl = sectionRoutes[defaultSection];
+
+        history.replaceState({ section: defaultSection }, '', defaultUrl);
+        updateActive(defaultSection);
+    }
 });
 </script>

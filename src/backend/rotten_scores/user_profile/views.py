@@ -11,33 +11,32 @@ def my_ratings_and_reviews(request):
     user_id = request.user.id
 
     data = [
-          {
-            "$match": {"userId": user_id }
-          },
-          {
+        { "$match": {"userId": user_id} },
+        {
             "$lookup": {
-              "from": "games",
-              "localField": "gameId",
-              "foreignField": "_id",
-              "as": "game_info"
+                "from": "games",
+                "localField": "gameId",
+                "foreignField": "_id",
+                "as": "game_info"
             }
-          },
-          {
+        },
+        {
             "$project": {
-              "_id": 0,
-              "text": 1,
-              "rating": 1,
-              "createdAt": 1,
-              "game_info.title": 1,
-              "game_info.imageUrl": 1
+                "_id": 0,
+                "text": 1,
+                "rating": 1,
+                "createdAt": 1,
+                "game_info.title": 1,
+                "game_info.imageUrl": 1
             }
-          }
-        ]
+        }
+    ]
 
     reviews = list(db.user_reviews.aggregate(data))
 
     context = {
         'reviews': reviews,
+        'section_template': 'profile/sections/ratings.html',
     }
 
     return render(request, 'profile/base_profile.html', context)
@@ -62,7 +61,7 @@ def load_section(request):
         'ratings': 'ratings.html',
         'account': 'account.html',
         'statistics': 'statistics.html',
-        'admin': 'admin.html'
+        'admin_panel': 'admin.html'
     }
 
     template_name = f'profile/sections/{section_mapping.get(section, "ratings.html")}'
@@ -74,24 +73,24 @@ def load_section(request):
 
 
 def account(request):
-    personal_form = ChangePersonalDataForm(data=request.POST, user=request.user)
-    password_form = ChangePasswordForm(data=request.POST, user=request.user)
+    personal_form = ChangePersonalDataForm(data=request.POST or None, user=request.user)
+    password_form = ChangePasswordForm(data=request.POST or None, user=request.user)
 
     if request.method == 'POST':
-        if 'form_type' in request.POST:
-            form_type = request.POST['form_type']
+        form_type = request.POST.get('form_type')
 
-            if form_type == 'personal' and personal_form.is_valid():
-                personal_form.save()
-                return custom_logout(request)
+        if form_type == 'personal' and personal_form.is_valid():
+            personal_form.save()
+            return custom_logout(request)
 
-            elif form_type == 'password' and password_form.is_valid():
-                password_form.save()
-                return custom_logout(request)
+        elif form_type == 'password' and password_form.is_valid():
+            password_form.save()
+            return custom_logout(request)
 
     context = {
         'personal_form': personal_form,
         'password_form': password_form,
+        'section_template': 'profile/sections/account.html',
     }
 
     return render(request, 'profile/base_profile.html', context)
@@ -106,17 +105,9 @@ def statistics(request):
     user_reviews = list(db.user_reviews.find({"userId": user_id}))
     games_reviewed = len(user_reviews)
 
-    if games_reviewed == 0:
-        context = {
-            'games_reviewed': 0,
-            'favourite_platform': 'None',
-            'favourite_genre': 'None',
-        }
-        return render(request, 'profile/base_profile.html', context)
-
     platform_counter = {}
     genre_counter = {}
-    # TODO исправить получение платформы и жанра
+
     for review in user_reviews:
         platform = review.get("platform")
         if platform:
@@ -127,6 +118,8 @@ def statistics(request):
             for genre in game.get("genres", []):
                 genre_counter[genre] = genre_counter.get(genre, 0) + 1
 
+    # TODO: fix choosing favourite_platform and favourite_genre
+
     favourite_platform = max(platform_counter, key=platform_counter.get, default='None')
     favourite_genre = max(genre_counter, key=genre_counter.get, default='None')
 
@@ -134,10 +127,15 @@ def statistics(request):
         'games_reviewed': games_reviewed,
         'favourite_platform': favourite_platform,
         'favourite_genre': favourite_genre,
+        'section_template': 'profile/sections/statistics.html',
     }
 
     return render(request, 'profile/base_profile.html', context)
 
 
+
 def admin_panel(request):
-    return HttpResponse("Заглушка")
+    context = {
+        'section_template': 'profile/sections/admin.html',
+    }
+    return render(request, 'profile/base_profile.html', context)
