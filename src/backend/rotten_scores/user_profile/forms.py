@@ -75,18 +75,17 @@ class ChangePasswordForm(forms.Form):
     current_password = forms.CharField(
         label="Current Password",
         widget=forms.PasswordInput(attrs={"class": "login-input"}),
-        validators=[MinLengthValidator(4)],
     )
     new_password = forms.CharField(
         label="New Password",
         widget=forms.PasswordInput(attrs={"class": "login-input"}),
-        help_text="Must be at least 6 characters with 1 number and special character",
+        help_text="Must be at least 4 characters.",
         validators=[MinLengthValidator(4)],
     )
     confirm_password = forms.CharField(
         label="Confirm Password",
         widget=forms.PasswordInput(attrs={"class": "login-input"}),
-        help_text="Must be at least 6 characters with 1 number and special character",
+        help_text="Must be at least 4 characters.",
         validators=[MinLengthValidator(4)],
     )
 
