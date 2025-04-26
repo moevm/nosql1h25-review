@@ -71,6 +71,7 @@ def load_section(request):
     except:
         return HttpResponseNotFound("Section not found")
 
+
 def account(request):
     personal_form = ChangePersonalDataForm(data=request.POST or None, user=request.user)
     password_form = ChangePasswordForm(data=request.POST or None, user=request.user)
@@ -116,6 +117,8 @@ def statistics(request):
         if game:
             for genre in game.get("genres", []):
                 genre_counter[genre] = genre_counter.get(genre, 0) + 1
+
+    # TODO: fix choosing favourite_platform and favourite_genre
 
     favourite_platform = max(platform_counter, key=platform_counter.get, default='None')
     favourite_genre = max(genre_counter, key=genre_counter.get, default='None')
