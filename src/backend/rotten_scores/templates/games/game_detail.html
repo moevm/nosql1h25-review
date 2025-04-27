@@ -16,12 +16,19 @@
             <p><strong>Genres:</strong> {{ game.genres|join:", " }}</p>
             <p><strong>Platforms:</strong> {{ game.platforms|join:", " }}</p>
             <p>{{ game.description }}</p>
-            
+            {% if user.role != 'admin' %}
             <div class="mt-3">
+              {% if user.is_authenticated %}
                 <button type="button" class="btn" style="background-color: #FFBD3F; color: black;" data-bs-toggle="modal" data-bs-target="#addReviewModal">
                     Add my review
                 </button>
+              {% else %}
+                <button type="button" class="btn" style="background-color: #FFBD3F; color: black;" id="authButton2">
+                  Authorization
+                </button>
+              {% endif %}
             </div>
+            {% endif %}
         </div>
     </div>
 </div>
@@ -54,26 +61,25 @@
             </div>
   
             <div class="mb-4 text-center">
-              <label for="rating" class="form-label">My Score</label>
+              <h4 for="rating" class="form-label">My Score</h4>
               <div class="d-flex justify-content-center align-items-center" id="ratingContainer">
                 {% for i in range_1_10 %}
                   <label class="rating-label mx-1" style="cursor: pointer;">
                     <input type="radio" name="rating" value="{{ i }}" class="d-none rating-input" required>
                     <span class="rating-circle" data-value="{{ i }}" style="
                         display: inline-block;
-                        width: 25px;
-                        height: 25px;
-                        line-height: 25px;
+                        width: 40px;
+                        height: 40px;
+                        line-height: 40px;
                         border-radius: 50%;
                         background-color: 
                           {% if i <= 3 %}#dc3545
                           {% elif i <= 7 %}#ffc107
                           {% else %}#28a745
-                          {% endif %}
-                        ;
+                          {% endif %};
                         color: white;
                         font-weight: bold;
-                        font-size: 0.9rem;
+                        font-size: 1rem;
                     ">{{ i }}</span>
                   </label>
                 {% endfor %}
@@ -116,7 +122,16 @@
     const ratingCircles = document.querySelectorAll('.rating-circle');
     const platformSelect = document.getElementById('platform');
     const reviewModal = document.getElementById('addReviewModal');
-    
+
+    const modal = document.getElementById('loginModal');
+    const authButton = document.getElementById('authButton2');
+
+    if (authButton) {
+      authButton.addEventListener('click', function () {
+          modal.style.display = 'block';
+      });
+    }
+
     reviewText.addEventListener('input', function() {
       charCount.textContent = reviewText.value.length;
     });
@@ -130,15 +145,17 @@
           
           circle.style.removeProperty('background-color');
           
-          if (circleValue > selectedValue) {
-            circle.style.backgroundColor = '#aaaaaa';
+          // Логика окраски в зависимости от выбранной оценки
+          if (circleValue <= 3) {
+            circle.style.backgroundColor = '#dc3545'; 
+          } else if (circleValue <= 7) {
+            circle.style.backgroundColor = '#ffc107'; 
           } else {
-            if (circleValue <= 3) {
-              circle.style.backgroundColor = '#dc3545'; 
-              circle.style.backgroundColor = '#ffc107'; 
-            } else {
-              circle.style.backgroundColor = '#28a745'; 
-            }
+            circle.style.backgroundColor = '#28a745'; 
+          }
+          
+          if (circleValue > selectedValue) {
+            circle.style.backgroundColor = '#aaaaaa'; 
           }
         });
       });
@@ -154,17 +171,19 @@
         const circleValue = parseInt(circle.getAttribute('data-value'));
         
         if (circleValue <= 3) {
-          circle.style.backgroundColor = '#dc3545'; 
+          circle.style.backgroundColor = '#dc3545';
         } else if (circleValue <= 7) {
-          circle.style.backgroundColor = '#ffc107'; 
+          circle.style.backgroundColor = '#ffc107';
         } else {
-          circle.style.backgroundColor = '#28a745'; 
+          circle.style.backgroundColor = '#28a745';
         }
       });
     }
     
     cancelButton.addEventListener('click', resetForm);
     
+    reviewModal.addEventListener('hidden.bs.modal', resetForm);
+
     reviewModal.addEventListener('hidden.bs.modal', resetForm);
   });
   </script>
