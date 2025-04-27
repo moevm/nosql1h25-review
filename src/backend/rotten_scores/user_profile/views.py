@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound
+from django.template.defaulttags import now
 from pymongo import MongoClient
 from django.conf import settings
 from user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
@@ -40,8 +41,62 @@ def my_ratings_and_reviews(request):
     }
 
     return render(request, 'profile/base_profile.html', context)
+client = MongoClient("mongodb://localhost:27017/")
+db = client['your_database']
+games_collection = db['games']
+def account_view(request):
+    personal_form = ChangePersonalDataForm(data=request.POST or None, user=request.user)
+    password_form = ChangePasswordForm(data=request.POST or None, user=request.user)
+    if request.method == 'POST':
+        form_type = request.POST.get('form_type')
 
+        if form_type == 'addgame':
+            name = request.POST.get('name')
+            description = request.POST.get('description')
+            release_date = request.POST.get('released_on')
+            developer = request.POST.get('game_author')
+            publisher = developer
 
+            platforms = request.POST.getlist('platforms')
+            genres = request.POST.getlist('genres')
+
+            image_url = "https://clck.ru/3KC37a"  # допустим пока ссылка заглушка
+
+            # Формируем документ MongoDB
+            game_doc = {
+                "title": name,
+                "description": description,
+                "developer": developer,
+                "publisher": publisher,
+                "platforms": platforms,
+                "releaseDate": release_date,
+                "genres": genres,
+                "imageUrl": image_url,
+                "stats": {
+                    "userReviews": {
+                        "total": 0,
+                        "avgRating": 0
+                    },
+                    "criticReviews": {
+                        "total": 0,
+                        "avgRating": 0
+                    }
+                },
+                "recentUserReviews": [],
+                "recentCriticReviews": [],
+                "lastModified": now()
+            }
+
+            games_collection.insert_one(game_doc)
+
+            return redirect('account')
+
+    return render(request, 'account.html', {
+        'personal_form': personal_form,
+        'password_form': password_form,
+        'user': request.user,
+
+    })
 def custom_logout(request):
     if request.user.is_authenticated:
         # Получаем текущего пользователя и вызываем его метод logout

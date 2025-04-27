@@ -59,7 +59,7 @@
 <div class="tab-content" id="tab-addgame" style="display: none;">
   <form method="post" enctype="multipart/form-data" id="AddGameCardForm" style="display: flex; flex-direction: column; gap: 30px; width: 100%; font-family: 'Inter', sans-serif;">
     {% csrf_token %}
-
+    <input type="hidden" name="form_type" value="addgame">
     <div style="display: flex; gap: 40px; align-items: flex-start;">
 
       <!-- Левая колонка: Загрузка изображения -->
