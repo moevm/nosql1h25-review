@@ -5,14 +5,16 @@ from pymongo import MongoClient
 from django.conf import settings
 from user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
 
+client = MongoClient(settings.MONGO_DB_URI)
+db = client[settings.MONGO_DB_NAME]
+games_collection = db['games']
+
 
 def my_ratings_and_reviews(request):
-    client = MongoClient(settings.MONGO_DB_URI)
-    db = client[settings.MONGO_DB_NAME]
     user_id = request.user.id
 
     data = [
-        { "$match": {"userId": user_id} },
+        {"$match": {"userId": user_id}},
         {
             "$lookup": {
                 "from": "games",
@@ -41,9 +43,8 @@ def my_ratings_and_reviews(request):
     }
 
     return render(request, 'profile/base_profile.html', context)
-client = MongoClient("mongodb://localhost:27017/")
-db = client['your_database']
-games_collection = db['games']
+
+
 def account_view(request):
     personal_form = ChangePersonalDataForm(data=request.POST or None, user=request.user)
     password_form = ChangePasswordForm(data=request.POST or None, user=request.user)
@@ -97,6 +98,8 @@ def account_view(request):
         'user': request.user,
 
     })
+
+
 def custom_logout(request):
     if request.user.is_authenticated:
         # Получаем текущего пользователя и вызываем его метод logout
@@ -154,9 +157,6 @@ def account(request):
 def statistics(request):
     user_id = request.user.id
 
-    client = MongoClient(settings.MONGO_DB_URI)
-    db = client[settings.MONGO_DB_NAME]
-
     user_reviews = list(db.user_reviews.find({"userId": user_id}))
     games_reviewed = len(user_reviews)
 
@@ -182,7 +182,7 @@ def statistics(request):
     favourite_platform = 'None'
     if platform_counter:
         favourite_platform = max(platform_counter.items(), key=lambda x: x[1])[0]
-    
+
     favourite_genre = 'None'
     if genre_counter:
         favourite_genre = max(genre_counter.items(), key=lambda x: x[1])[0]
