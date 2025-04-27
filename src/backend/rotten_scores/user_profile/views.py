@@ -113,15 +113,24 @@ def statistics(request):
         if platform:
             platform_counter[platform] = platform_counter.get(platform, 0) + 1
 
-        game = db.games.find_one({"_id": review["gameId"]})
+        game_id = review.get("gameId")
+        if isinstance(game_id, str):
+            from bson.objectid import ObjectId
+            game_id = ObjectId(game_id)
+
+        game = db.games.find_one({"_id": game_id})
         if game:
-            for genre in game.get("genres", []):
+            genres = game.get("genres", [])
+            for genre in genres:
                 genre_counter[genre] = genre_counter.get(genre, 0) + 1
 
-    # TODO: fix choosing favourite_platform and favourite_genre
-
-    favourite_platform = max(platform_counter, key=platform_counter.get, default='None')
-    favourite_genre = max(genre_counter, key=genre_counter.get, default='None')
+    favourite_platform = 'None'
+    if platform_counter:
+        favourite_platform = max(platform_counter.items(), key=lambda x: x[1])[0]
+    
+    favourite_genre = 'None'
+    if genre_counter:
+        favourite_genre = max(genre_counter.items(), key=lambda x: x[1])[0]
 
     context = {
         'games_reviewed': games_reviewed,
@@ -131,7 +140,6 @@ def statistics(request):
     }
 
     return render(request, 'profile/base_profile.html', context)
-
 
 
 def admin_panel(request):
