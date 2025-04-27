@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     mainContent.innerHTML = newContent.innerHTML;
                     history.pushState({ section }, '', url);
                     updateActive(section);
-                    initializeTabs(); 
+                    initializeTabs();
                 }
             })
             .catch(error => {
