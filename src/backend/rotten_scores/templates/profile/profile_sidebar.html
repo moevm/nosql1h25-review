@@ -112,6 +112,32 @@ document.addEventListener('DOMContentLoaded', function() {
         if (target) target.classList.add('active');
     }
 
+    function initializeTabs() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        if (tabButtons.length === 0 || tabContents.length === 0) return;
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const tab = button.getAttribute('data-tab');
+
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+
+                tabContents.forEach(content => {
+                    if (content.id === 'tab-' + tab) {
+                        content.style.display = 'block';
+                        content.classList.add('active');
+                    } else {
+                        content.style.display = 'none';
+                        content.classList.remove('active');
+                    }
+                });
+            });
+        });
+    }
+
     function loadSection(section) {
         const url = sectionRoutes[section] || sectionRoutes['ratings'];
 
@@ -126,6 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     mainContent.innerHTML = newContent.innerHTML;
                     history.pushState({ section }, '', url);
                     updateActive(section);
+                    initializeTabs(); 
                 }
             })
             .catch(error => {
@@ -149,5 +176,8 @@ document.addEventListener('DOMContentLoaded', function() {
         history.replaceState({ section: defaultSection }, '', defaultUrl);
         updateActive(defaultSection);
     }
+
+    initializeTabs();
 });
 </script>
+
