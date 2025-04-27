@@ -16,7 +16,156 @@
             <p><strong>Genres:</strong> {{ game.genres|join:", " }}</p>
             <p><strong>Platforms:</strong> {{ game.platforms|join:", " }}</p>
             <p>{{ game.description }}</p>
+            
+            <div class="mt-3">
+                <button type="button" class="btn" style="background-color: #FFBD3F; color: black;" data-bs-toggle="modal" data-bs-target="#addReviewModal">
+                    Add my review
+                </button>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Модалка -->
+<div class="modal fade" id="addReviewModal" tabindex="-1" aria-labelledby="addReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form method="post" action="{% url 'reviews:add_review' game.id %}" id="reviewForm">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title" id="addReviewModalLabel">Add My Review</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          
+          <div class="modal-body">
+  
+            <!-- Игра -->
+            <div class="d-flex align-items-center mb-4">
+              <img src="{{ game.imageUrl|default:'https://via.placeholder.com/80x120?text=No+Image' }}"
+                   alt="{{ game.title }}" class="me-3" style="width: 80px; height: 120px; object-fit: cover; border-radius: 8px;">
+              <div>
+                <h5 class="mb-1">{{ game.title }}</h5>
+                <select class="form-select" id="platform" name="platform" required style="width: 200px;">
+                  {% for platform in game.platforms %}
+                    <option value="{{ platform }}">{{ platform }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+  
+            <div class="mb-4 text-center">
+              <label for="rating" class="form-label">My Score</label>
+              <div class="d-flex justify-content-center align-items-center" id="ratingContainer">
+                {% for i in range_1_10 %}
+                  <label class="rating-label mx-1" style="cursor: pointer;">
+                    <input type="radio" name="rating" value="{{ i }}" class="d-none rating-input" required>
+                    <span class="rating-circle" data-value="{{ i }}" style="
+                        display: inline-block;
+                        width: 25px;
+                        height: 25px;
+                        line-height: 25px;
+                        border-radius: 50%;
+                        background-color: 
+                          {% if i <= 3 %}#dc3545
+                          {% elif i <= 7 %}#ffc107
+                          {% else %}#28a745
+                          {% endif %}
+                        ;
+                        color: white;
+                        font-weight: bold;
+                        font-size: 0.9rem;
+                    ">{{ i }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </div>
+  
+            <div class="mb-3">
+              <label for="reviewText" class="form-label">Write a review</label>
+              <textarea 
+                class="form-control" 
+                id="reviewText" 
+                name="text" 
+                rows="5" 
+                maxlength="500"
+                placeholder="Write your review here..." 
+                required
+              ></textarea>
+              <div class="form-text text-end"><span id="charCount">0</span>/500 characters</div>
+            </div>
+  
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelButton" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Post</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Скрипт для подсчета символов, обработки рейтинга и сброса формы -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const reviewForm = document.getElementById('reviewForm');
+    const reviewText = document.getElementById('reviewText');
+    const charCount = document.getElementById('charCount');
+    const cancelButton = document.getElementById('cancelButton');
+    const ratingInputs = document.querySelectorAll('.rating-input');
+    const ratingCircles = document.querySelectorAll('.rating-circle');
+    const platformSelect = document.getElementById('platform');
+    const reviewModal = document.getElementById('addReviewModal');
+    
+    reviewText.addEventListener('input', function() {
+      charCount.textContent = reviewText.value.length;
+    });
+    
+    ratingInputs.forEach(input => {
+      input.addEventListener('change', function() {
+        const selectedValue = parseInt(this.value);
+        
+        ratingCircles.forEach(circle => {
+          const circleValue = parseInt(circle.getAttribute('data-value'));
+          
+          circle.style.removeProperty('background-color');
+          
+          if (circleValue > selectedValue) {
+            circle.style.backgroundColor = '#aaaaaa';
+          } else {
+            if (circleValue <= 3) {
+              circle.style.backgroundColor = '#dc3545'; 
+              circle.style.backgroundColor = '#ffc107'; 
+            } else {
+              circle.style.backgroundColor = '#28a745'; 
+            }
+          }
+        });
+      });
+    });
+    
+    // Сброс формы при закрытии модального окна
+    function resetForm() {
+      reviewForm.reset();
+      charCount.textContent = '0';
+      
+      ratingCircles.forEach(circle => {
+        circle.style.removeProperty('background-color');
+        const circleValue = parseInt(circle.getAttribute('data-value'));
+        
+        if (circleValue <= 3) {
+          circle.style.backgroundColor = '#dc3545'; 
+        } else if (circleValue <= 7) {
+          circle.style.backgroundColor = '#ffc107'; 
+        } else {
+          circle.style.backgroundColor = '#28a745'; 
+        }
+      });
+    }
+    
+    cancelButton.addEventListener('click', resetForm);
+    
+    reviewModal.addEventListener('hidden.bs.modal', resetForm);
+  });
+  </script>
 {% endblock %}

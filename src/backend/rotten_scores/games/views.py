@@ -37,7 +37,13 @@ def game_detail(request, pk):
     if 'releaseDate' in game and isinstance(game['releaseDate'], datetime):
         game['release_date_formatted'] = game['releaseDate'].strftime('%Y-%m-%d')
 
-    return render(request, 'games/game_detail.html', {'game': game})
+    context = {
+        'game': game,
+        'range_1_10': range(1, 11),
+    }
+
+    return render(request, 'games/game_detail.html', context)
+
 
 logger = logging.getLogger(__name__)
 
