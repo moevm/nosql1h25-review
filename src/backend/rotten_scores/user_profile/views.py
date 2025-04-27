@@ -95,6 +95,7 @@ def account(request):
 
     return render(request, 'profile/base_profile.html', context)
 
+
 def statistics(request):
     user_id = request.user.id
 
@@ -139,7 +140,6 @@ def statistics(request):
     }
 
     return render(request, 'profile/base_profile.html', context)
-
 
 
 def admin_panel(request):
