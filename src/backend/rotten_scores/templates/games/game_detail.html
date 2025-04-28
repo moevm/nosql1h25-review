@@ -16,19 +16,27 @@
             <p><strong>Genres:</strong> {{ game.genres|join:", " }}</p>
             <p><strong>Platforms:</strong> {{ game.platforms|join:", " }}</p>
             <p>{{ game.description }}</p>
-            {% if user.role != 'admin' %}
-            <div class="mt-3">
-              {% if user.is_authenticated %}
-                <button type="button" class="btn" style="background-color: #FFBD3F; color: black;" data-bs-toggle="modal" data-bs-target="#addReviewModal">
-                    Add my review
-                </button>
-              {% else %}
-                <button type="button" class="btn" style="background-color: #FFBD3F; color: black;" id="authButton2">
-                  Authorization
-                </button>
-              {% endif %}
-            </div>
-            {% endif %}
+            {% if user.role != 'admin' and is_released %}
+              <div class="mt-3">
+                  {% if user.is_authenticated %}
+                      {% if available_platforms %}
+                          <button type="button" class="btn" style="background-color: #FFBD3F; color: black;" data-bs-toggle="modal" data-bs-target="#addReviewModal">
+                              Add my review
+                          </button>
+                      {% else %}
+                          <p class="text-muted"><i>You have already reviewed this game on all available platforms.</i></p>
+                      {% endif %}
+                  {% else %}
+                      <button type="button" class="btn" style="background-color: #FFBD3F; color: black;" id="authButton2">
+                          Authorization
+                      </button>
+                  {% endif %}
+              </div>
+              {% elif not is_released %}
+              <div class="mt-3">
+                  <p class="text-muted"><i>Reviews will be available after the game release.</i></p>
+              </div>
+          {% endif %}
         </div>
     </div>
 </div>
@@ -53,9 +61,10 @@
               <div>
                 <h5 class="mb-1">{{ game.title }}</h5>
                 <select class="form-select" id="platform" name="platform" required style="width: 200px;">
-                  {% for platform in game.platforms %}
-                    <option value="{{ platform }}">{{ platform }}</option>
-                  {% endfor %}
+                {% for platform in available_platforms %}
+                  <option value="{{ platform }}">{{ platform }}</option>
+                {% endfor %}
+              
                 </select>
               </div>
             </div>
@@ -113,78 +122,89 @@
   
   <!-- Скрипт для подсчета символов, обработки рейтинга и сброса формы -->
   <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const reviewForm = document.getElementById('reviewForm');
-    const reviewText = document.getElementById('reviewText');
-    const charCount = document.getElementById('charCount');
-    const cancelButton = document.getElementById('cancelButton');
-    const ratingInputs = document.querySelectorAll('.rating-input');
-    const ratingCircles = document.querySelectorAll('.rating-circle');
-    const platformSelect = document.getElementById('platform');
-    const reviewModal = document.getElementById('addReviewModal');
-
-    const modal = document.getElementById('loginModal');
-    const authButton = document.getElementById('authButton2');
-
-    if (authButton) {
-      authButton.addEventListener('click', function () {
-          modal.style.display = 'block';
-      });
-    }
-
-    reviewText.addEventListener('input', function() {
-      charCount.textContent = reviewText.value.length;
-    });
+    document.addEventListener('DOMContentLoaded', function() {
+      const reviewForm = document.getElementById('reviewForm');
+      const reviewText = document.getElementById('reviewText');
+      const charCount = document.getElementById('charCount');
+      const cancelButton = document.getElementById('cancelButton');
+      const ratingInputs = document.querySelectorAll('.rating-input');
+      const ratingCircles = document.querySelectorAll('.rating-circle');
+      const platformSelect = document.getElementById('platform');
+      const reviewModal = document.getElementById('addReviewModal');
     
-    ratingInputs.forEach(input => {
-      input.addEventListener('change', function() {
-        const selectedValue = parseInt(this.value);
+      const modal = document.getElementById('loginModal');
+      const authButton = document.getElementById('authButton2');
+    
+      if (authButton) {
+        authButton.addEventListener('click', function () {
+            modal.style.display = 'block';
+        });
+      }
+    
+      reviewText.addEventListener('input', function() {
+        charCount.textContent = reviewText.value.length;
+      });
+      
+      ratingCircles.forEach(circle => {
+        const circleValue = parseInt(circle.getAttribute('data-value'));
+        
+        if (circleValue <= 3) {
+          circle.style.backgroundColor = 'rgba(220, 53, 69, 0.4)'; 
+        } else if (circleValue <= 7) {
+          circle.style.backgroundColor = 'rgba(255, 193, 7, 0.4)'; 
+        } else {
+          circle.style.backgroundColor = 'rgba(40, 167, 69, 0.4)'; 
+        }
+      });
+      
+      ratingInputs.forEach(input => {
+        input.addEventListener('change', function() {
+          const selectedValue = parseInt(this.value);
+          
+          ratingCircles.forEach(circle => {
+            const circleValue = parseInt(circle.getAttribute('data-value'));
+            
+            if (circleValue <= selectedValue) {
+              if (circleValue <= 3) {
+                circle.style.backgroundColor = 'rgba(220, 53, 69, 1)'; 
+              } else if (circleValue <= 7) {
+                circle.style.backgroundColor = 'rgba(255, 193, 7, 1)'; 
+              } else {
+                circle.style.backgroundColor = 'rgba(40, 167, 69, 1)';
+              }
+            } else {
+              if (circleValue <= 3) {
+                circle.style.backgroundColor = 'rgba(220, 53, 69, 0.4)';
+              } else if (circleValue <= 7) {
+                circle.style.backgroundColor = 'rgba(255, 193, 7, 0.4)'; 
+              } else {
+                circle.style.backgroundColor = 'rgba(40, 167, 69, 0.4)'; 
+              }
+            }
+          });
+        });
+      });
+      
+      // Сброс формы при закрытии модального окна
+      function resetForm() {
+        reviewForm.reset();
+        charCount.textContent = '0';
         
         ratingCircles.forEach(circle => {
           const circleValue = parseInt(circle.getAttribute('data-value'));
           
-          circle.style.removeProperty('background-color');
-          
-          // Логика окраски в зависимости от выбранной оценки
           if (circleValue <= 3) {
-            circle.style.backgroundColor = '#dc3545'; 
+            circle.style.backgroundColor = 'rgba(220, 53, 69, 0.4)'; 
           } else if (circleValue <= 7) {
-            circle.style.backgroundColor = '#ffc107'; 
-          } else {
-            circle.style.backgroundColor = '#28a745'; 
-          }
-          
-          if (circleValue > selectedValue) {
-            circle.style.backgroundColor = '#aaaaaa'; 
+            circle.style.backgroundColor = 'rgba(255, 193, 7, 0.4)'; 
+            circle.style.backgroundColor = 'rgba(40, 167, 69, 0.4)'; 
           }
         });
-      });
-    });
-    
-    // Сброс формы при закрытии модального окна
-    function resetForm() {
-      reviewForm.reset();
-      charCount.textContent = '0';
+      }
       
-      ratingCircles.forEach(circle => {
-        circle.style.removeProperty('background-color');
-        const circleValue = parseInt(circle.getAttribute('data-value'));
-        
-        if (circleValue <= 3) {
-          circle.style.backgroundColor = '#dc3545';
-        } else if (circleValue <= 7) {
-          circle.style.backgroundColor = '#ffc107';
-        } else {
-          circle.style.backgroundColor = '#28a745';
-        }
-      });
-    }
-    
-    cancelButton.addEventListener('click', resetForm);
-    
-    reviewModal.addEventListener('hidden.bs.modal', resetForm);
-
-    reviewModal.addEventListener('hidden.bs.modal', resetForm);
-  });
+      cancelButton.addEventListener('click', resetForm);
+      
+      reviewModal.addEventListener('hidden.bs.modal', resetForm);
+    });
   </script>
 {% endblock %}
