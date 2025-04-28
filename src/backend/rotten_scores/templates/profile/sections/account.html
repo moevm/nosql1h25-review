@@ -54,3 +54,67 @@
     </form>
   </div>
 </div>
+
+<!-- Стили табов -->
+<style>
+  .tab-button {
+    padding: 10px 20px;
+    border: none;
+    background: none;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    color: gray;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+  }
+
+  .tab-button.active {
+    color: black;
+    border-bottom: 3px solid #FFBD3F;
+    background-color: #fff8e5;
+  }
+
+  .tab-button:hover {
+    color: #FFBD3F;
+  }
+
+  .tab-content {
+    transition: all 0.3s;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    if (tabButtons.length > 0 && !tabButtons[0].classList.contains('active')) {
+      const firstVisibleTab = Array.from(tabButtons).find(btn => btn.style.display !== 'none');
+      if (firstVisibleTab) {
+        firstVisibleTab.classList.add('active');
+        const tab = firstVisibleTab.getAttribute('data-tab');
+        document.getElementById(`tab-${tab}`).style.display = 'block';
+      }
+    }
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const tab = button.getAttribute('data-tab');
+
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        tabContents.forEach(content => {
+          if (content.id === 'tab-' + tab) {
+            content.style.display = 'block';
+            content.classList.add('active');
+          } else {
+            content.style.display = 'none';
+            content.classList.remove('active');
+          }
+        });
+      });
+    });
+  });
+</script>
