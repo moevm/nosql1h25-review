@@ -7,6 +7,11 @@ from djongo.database import Binary
 from pymongo import MongoClient
 from django.conf import settings
 from user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
+from bson.objectid import ObjectId
+from django.utils.dateparse import parse_date
+from bson import datetime as bson_datetime
+from datetime import datetime as py_datetime
+
 
 client = MongoClient(settings.MONGO_DB_URI)
 db = client[settings.MONGO_DB_NAME]
@@ -47,47 +52,7 @@ def my_ratings_and_reviews(request):
     return render(request, 'profile/base_profile.html', context)
 
 
-def account_view(request):
-    games_collection = db['games']
-    if request.method == 'POST':
-        form_type = request.POST.get('form_type')
 
-        if form_type == 'addgame':
-            name = request.POST.get('name')
-            description = request.POST.get('description')
-            released_on = request.POST.get('released_on')
-            game_author = request.POST.get('game_author')
-
-            platforms = request.POST.getlist('platforms')
-            genres = request.POST.getlist('genres')
-
-            # Сохраняем картинку
-            image_file = request.FILES.get('game_image')
-            image_path = None
-            if image_file:
-                # например, сохраняем локально
-                with open(f'media/games/{image_file.name}', 'wb+') as destination:
-                    for chunk in image_file.chunks():
-                        destination.write(chunk)
-                image_path = f'media/games/{image_file.name}'
-
-            game = {
-                'name': name,
-                'description': description,
-                'released_on': released_on,
-                'game_author': game_author,
-                'platforms': platforms,
-                'genres': genres,
-                'image_path': image_path,
-                'created_at': timezone.now(),
-                'updated_at': timezone.now(),
-            }
-
-            games_collection.insert_one(game)
-
-            return redirect('account')  # редиректим обратно на аккаунт после сохранения
-
-    return render(request, 'account.html')
 
 def custom_logout(request):
     if request.user.is_authenticated:
@@ -120,7 +85,12 @@ def load_section(request):
         return HttpResponseNotFound("Section not found")
 
 
+
+
 def account(request):
+    games_collection = db['games']
+
+    # Обработка форм личных данных и пароля
     personal_form = ChangePersonalDataForm(data=request.POST or None, user=request.user)
     password_form = ChangePasswordForm(data=request.POST or None, user=request.user)
 
@@ -135,6 +105,52 @@ def account(request):
             password_form.save()
             return custom_logout(request)
 
+
+        elif form_type == 'addgame':
+            title = request.POST.get('name')
+            description = request.POST.get('description')
+            released_on = request.POST.get('released_on')
+            developer = request.POST.get('game_author')
+            publisher = request.POST.get('game_author')
+            image_url = request.POST.get('image_url')
+            platforms = request.POST.getlist('platforms')
+            genres = request.POST.getlist('genres')
+            release_date = None
+            if released_on:
+                parsed_date = parse_date(released_on)
+                if parsed_date:
+                    release_date = bson_datetime.datetime.combine(
+                        parsed_date,
+                        py_datetime.min.time()
+                    )
+            game = {
+                'title': title,
+                'description': description,
+                'developer': developer,
+                'publisher': publisher,
+                'platforms': platforms,
+                'genres': genres,
+                'imageUrl': image_url,  # Используем URL напрямую
+                'releaseDate': release_date,
+                'stats': {
+                    'userReviews': {'total': 0, 'avgRating': 0.0},
+                    'criticReviews': {'total': 0, 'avgRating': 0.0}
+                },
+                'createdAt': timezone.now(),
+                'lastModified': timezone.now()
+            }
+
+
+            try:
+                result = games_collection.insert_one(game)
+                print(f"Game saved with ID: {result.inserted_id}")
+                return redirect('account')
+            except Exception as e:
+                print(f"Error saving game: {e}")
+                # Добавьте сообщение об ошибке для пользователя
+                from django.contrib import messages
+                messages.error(request, f"Error saving game: {e}")
+
     context = {
         'personal_form': personal_form,
         'password_form': password_form,
@@ -142,8 +158,6 @@ def account(request):
     }
 
     return render(request, 'profile/base_profile.html', context)
-
-
 def statistics(request):
     user_id = request.user.id
 
