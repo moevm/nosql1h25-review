@@ -55,23 +55,24 @@
     </form>
   </div>
 
-  <!-- Add Game Card Form -->
+<!-- Add Game Card Form -->
 <div class="tab-content" id="tab-addgame" style="display: none;">
   <form method="post" enctype="multipart/form-data" id="AddGameCardForm" style="display: flex; flex-direction: column; gap: 30px; width: 100%; font-family: 'Inter', sans-serif;">
     {% csrf_token %}
     <input type="hidden" name="form_type" value="addgame">
+
     <div style="display: flex; gap: 40px; align-items: flex-start;">
 
       <!-- Левая колонка: Загрузка изображения -->
-      <div style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center;">
-        <label for="gameImageUpload" style="cursor: pointer; width: 176px; height: 264px; background-color: #f0f0f0; border: 2px dashed #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: gray;">
-          <span id="uploadText">Click to upload game image</span>
-          <img id="gameImagePreview" src="#" alt="Game Image Preview" style="display: none; max-width: 100%; max-height: 100%; border-radius: 8px;">
+      <div style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+        <label for="gameImageUpload" style="cursor: pointer; width: 176px; height: 264px; background-color: #f0f0f0; border: 2px dashed #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+          <img id="gameImagePreview" src="#" alt="Game Image Preview" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
         </label>
         <input type="file" id="gameImageUpload" name="game_image" accept="image/*" style="display: none;" onchange="previewGameImage(event)">
+        <span id="uploadText" style="font-size: 14px; color: gray;">Click to upload game image</span>
       </div>
 
-      <!-- Правая часть: Поля + Чекбоксы в строку -->
+      <!-- Правая колонка: Поля + Чекбоксы -->
       <div style="flex: 1; display: flex; gap: 40px;">
 
         <!-- Текстовые поля -->
@@ -114,10 +115,35 @@
             <label style="font-weight: 700; font-size: 16px;">Genres:</label>
             <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 8px;">
               <label><input type="checkbox" name="genres" value="Action"> Action</label>
-              <label><input type="checkbox" name="genres" value="Action Adventure"> Action Adventure</label>
-              <label><input type="checkbox" name="genres" value="Action Puzzle"> Action Puzzle</label>
-              <label><input type="checkbox" name="genres" value="Action RPG"> Action RPG</label>
               <label><input type="checkbox" name="genres" value="Adventure"> Adventure</label>
+              <label><input type="checkbox" name="genres" value="Role-playing (RPG)"> Role-playing (RPG)</label>
+              <label><input type="checkbox" name="genres" value="Strategy"> Strategy</label>
+              <label><input type="checkbox" name="genres" value="Simulation"> Simulation</label>
+              <label><input type="checkbox" name="genres" value="Sports"> Sports</label>
+              <label><input type="checkbox" name="genres" value="Racing"> Racing</label>
+              <label><input type="checkbox" name="genres" value="Fighting"> Fighting</label>
+              <label><input type="checkbox" name="genres" value="Puzzle"> Puzzle</label>
+              <label><input type="checkbox" name="genres" value="Horror"> Horror</label>
+              <label><input type="checkbox" name="genres" value="Survival"> Survival</label>
+              <label><input type="checkbox" name="genres" value="Battle Royale"> Battle Royale</label>
+              <label><input type="checkbox" name="genres" value="MMORPG"> MMORPG</label>
+              <label><input type="checkbox" name="genres" value="MOBA"> MOBA</label>
+              <label><input type="checkbox" name="genres" value="Platformer"> Platformer</label>
+              <label><input type="checkbox" name="genres" value="Stealth"> Stealth</label>
+              <label><input type="checkbox" name="genres" value="Sandbox"> Sandbox</label>
+              <label><input type="checkbox" name="genres" value="Open World"> Open World</label>
+              <label><input type="checkbox" name="genres" value="First-person Shooter (FPS)"> First-person Shooter (FPS)</label>
+              <label><input type="checkbox" name="genres" value="Third-person Shooter (TPS)"> Third-person Shooter (TPS)</label>
+              <label><input type="checkbox" name="genres" value="Tactical Shooter"> Tactical Shooter</label>
+              <label><input type="checkbox" name="genres" value="Roguelike"> Roguelike</label>
+              <label><input type="checkbox" name="genres" value="Metroidvania"> Metroidvania</label>
+              <label><input type="checkbox" name="genres" value="Visual Novel"> Visual Novel</label>
+              <label><input type="checkbox" name="genres" value="Rhythm"> Rhythm</label>
+              <label><input type="checkbox" name="genres" value="Party"> Party</label>
+              <label><input type="checkbox" name="genres" value="Educational"> Educational</label>
+              <label><input type="checkbox" name="genres" value="Card Game"> Card Game</label>
+              <label><input type="checkbox" name="genres" value="Board Game"> Board Game</label>
+              <label><input type="checkbox" name="genres" value="Trivia"> Trivia</label>
             </div>
           </div>
         </div>
@@ -135,6 +161,7 @@
 
   </form>
 </div>
+
 </div>
 
 <!-- Стили табов -->

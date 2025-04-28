@@ -1,12 +1,15 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound
 from django.template.defaulttags import now
+from django.utils import timezone
+from django.utils.datetime_safe import datetime
+from djongo.database import Binary
 from pymongo import MongoClient
 from django.conf import settings
 from user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
 
-client = MongoClient(settings.MONGO_DB_URI)
-db = client[settings.MONGO_DB_NAME]
+client = MongoClient("mongodb://localhost:27017/")
+db = client['game_reviews_db']
 games_collection = db['games']
 
 
@@ -46,62 +49,49 @@ def my_ratings_and_reviews(request):
 
 
 def account_view(request):
-    personal_form = ChangePersonalDataForm(data=request.POST or None, user=request.user)
-    password_form = ChangePasswordForm(data=request.POST or None, user=request.user)
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
 
         if form_type == 'addgame':
             name = request.POST.get('name')
             description = request.POST.get('description')
-            release_date = request.POST.get('released_on')
-            developer = request.POST.get('game_author')
-            publisher = developer
+            released_on = request.POST.get('released_on')
+            game_author = request.POST.get('game_author')
 
             platforms = request.POST.getlist('platforms')
             genres = request.POST.getlist('genres')
 
-            image_url = "https://clck.ru/3KC37a"  # допустим пока ссылка заглушка
+            # Сохраняем картинку
+            image_file = request.FILES.get('game_image')
+            image_path = None
+            if image_file:
+                # например, сохраняем локально
+                with open(f'media/games/{image_file.name}', 'wb+') as destination:
+                    for chunk in image_file.chunks():
+                        destination.write(chunk)
+                image_path = f'media/games/{image_file.name}'
 
-            # Формируем документ MongoDB
-            game_doc = {
-                "title": name,
-                "description": description,
-                "developer": developer,
-                "publisher": publisher,
-                "platforms": platforms,
-                "releaseDate": release_date,
-                "genres": genres,
-                "imageUrl": image_url,
-                "stats": {
-                    "userReviews": {
-                        "total": 0,
-                        "avgRating": 0
-                    },
-                    "criticReviews": {
-                        "total": 0,
-                        "avgRating": 0
-                    }
-                },
-                "recentUserReviews": [],
-                "recentCriticReviews": [],
-                "lastModified": now()
+            game = {
+                'name': name,
+                'description': description,
+                'released_on': released_on,
+                'game_author': game_author,
+                'platforms': platforms,
+                'genres': genres,
+                'image_path': image_path,
+                'created_at': timezone.now(),
+                'updated_at': timezone.now(),
             }
 
-            games_collection.insert_one(game_doc)
+            games_collection.insert_one(game)
 
-            return redirect('account')
+            return redirect('account')  # редиректим обратно на аккаунт после сохранения
 
-    return render(request, 'account.html', {
-        'personal_form': personal_form,
-        'password_form': password_form,
-        'user': request.user,
-
-    })
-
+    return render(request, 'account.html')
 
 def custom_logout(request):
     if request.user.is_authenticated:
+        print(client.list_database_names())
         # Получаем текущего пользователя и вызываем его метод logout
         user = request.user
         user.logout()
