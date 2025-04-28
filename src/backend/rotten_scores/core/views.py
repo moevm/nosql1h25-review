@@ -8,10 +8,8 @@ from django.contrib.auth import login, authenticate
 from django.http import JsonResponse
 
 from pymongo import MongoClient
-import json
 from bson import json_util
 
-from rotten_scores.settings import MONGO_DB_URI, MONGO_DB_NAME
 
 from . import forms
 
@@ -135,9 +133,8 @@ class LoginView(FormView):
 
 
 def database_view(request):
-    client = MongoClient(MONGODB_URI)
-
-    db = client[MONGODB_NAME]
+    client = MongoClient(settings.MONGO_DB_URI)
+    db = client[settings.MONGO_DB_NAME]
 
     collection_names = [name for name in db.list_collection_names() if not name.startswith('system.')]
 
