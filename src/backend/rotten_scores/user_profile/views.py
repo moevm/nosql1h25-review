@@ -8,9 +8,8 @@ from pymongo import MongoClient
 from django.conf import settings
 from user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
 
-client = MongoClient("mongodb://localhost:27017/")
-db = client['game_reviews_db']
-games_collection = db['games']
+client = MongoClient(settings.MONGO_DB_URI)
+db = client[settings.MONGO_DB_NAME]
 
 
 def my_ratings_and_reviews(request):
@@ -49,6 +48,7 @@ def my_ratings_and_reviews(request):
 
 
 def account_view(request):
+    games_collection = db['games']
     if request.method == 'POST':
         form_type = request.POST.get('form_type')
 
