@@ -1,5 +1,333 @@
-<h2>Admin Panel</h2>
-<div class="admin-content">
-    <!-- Админ-панель -->
-    <p>Administration tools</p>
+<div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px;">
+  <h2 style="margin: 0;">Admin Panel</h2>
 </div>
+
+<div class="admin-content">
+  <!-- Табы -->
+  <div class="tabs" style="display: flex; border-bottom: 2px solid #eee; margin-bottom: 20px;">
+    <button class="tab-button active" data-tab="export-import">Export & Import</button>
+    <button class="tab-button" data-tab="added-games">Added Games</button>
+    <button class="tab-button" data-tab="addgame">Add Game Card</button>
+  </div>
+
+  <!-- Export & Import Form -->
+  <div class="tab-content active" id="tab-export-import">
+    <div style="padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
+      <h3 style="margin-top: 0;">Export & Import Data</h3>
+      <p>This section will contain tools for data export and import functionality.</p>
+      <div style="margin-top: 20px;">
+        <button style="background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">
+          Export Data
+        </button>
+        <button style="background-color: #2196F3; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer;">
+          Import Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Added Games List -->
+  <div class="tab-content" id="tab-added-games" style="display: none;">
+    <div style="padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
+      <h3 style="margin-top: 0;">Recently Added Games</h3>
+      <p>This section will display the list of recently added games.</p>
+      <div style="margin-top: 20px;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background-color: #f2f2f2;">
+              <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">Game Title</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">Date Added</th>
+              <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="3" style="padding: 15px; text-align: center;">No games added yet</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Game Card Form -->
+  <div class="tab-content" id="tab-addgame" style="display: none;">
+    <form method="post" id="AddGameCardForm" style="display: flex; flex-direction: column; gap: 30px; width: 100%; font-family: 'Inter', sans-serif;">
+      {% csrf_token %}
+      <input type="hidden" name="form_type" value="addgame">
+
+      <div style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap;">
+        <!-- Левая колонка: Поле для URL изображения -->
+        <div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 15px; width: 300px;">
+          <div style="display: flex; flex-direction: column; gap: 5px;">
+            <label style="font-weight: 600; font-size: 14px;">Image URL:</label>
+            <input type="text" name="image_url" id="imageUrlInput" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;" placeholder="https://example.com/image.jpg">
+          </div>
+
+          <!-- Превью изображения -->
+          <div style="width: 176px; height: 264px; background-color: #f0f0f0; border-radius: 8px; overflow: hidden;">
+            <img id="gameImagePreview" src="" alt="Game Image Preview" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+          </div>
+        </div>
+
+        <div style="flex: 1; display: flex; gap: 40px; flex-wrap: wrap;">
+          <!-- Текстовые поля -->
+          <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 15px;">
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+              <label style="font-weight: 600; font-size: 14px;">Name:</label>
+              <input type="text" name="name" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+              <label style="font-weight: 600; font-size: 14px;">Description:</label>
+              <textarea name="description" rows="3" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;"></textarea>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+              <label style="font-weight: 600; font-size: 14px;">Released On:</label>
+              <input type="date" name="released_on" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+              <label style="font-weight: 600; font-size: 14px;">Game Author:</label>
+              <input type="text" name="game_author" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">
+            </div>
+          </div>
+
+          <!-- Чекбоксы -->
+          <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 30px;">
+            <!-- Platforms Checkboxes -->
+            <div>
+              <label style="font-weight: 700; font-size: 16px; display: block; margin-bottom: 10px;">Platforms:</label>
+              <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+                  <input type="checkbox" name="platforms" value="PS5"> PS5
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+                  <input type="checkbox" name="platforms" value="Xbox Series X/S"> Xbox Series X/S
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+                  <input type="checkbox" name="platforms" value="Nintendo Switch"> Nintendo Switch
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+                  <input type="checkbox" name="platforms" value="PC"> PC
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+                  <input type="checkbox" name="platforms" value="Mobile"> Mobile
+                </label>
+              </div>
+            </div>
+
+            <!-- Genres Checkboxes -->
+            <div>
+              <label style="font-weight: 700; font-size: 16px; display: block; margin-bottom: 10px;">Genres:</label>
+              <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Action"> Action
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Adventure"> Adventure
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Role-playing (RPG)"> Role-playing (RPG)
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Strategy"> Strategy
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Simulation"> Simulation
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Sports"> Sports
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Racing"> Racing
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Fighting"> Fighting
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Puzzle"> Puzzle
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Horror"> Horror
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Survival"> Survival
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Battle Royale"> Battle Royale
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="MMORPG"> MMORPG
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="MOBA"> MOBA
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Platformer"> Platformer
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Stealth"> Stealth
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Sandbox"> Sandbox
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Open World"> Open World
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="First-person Shooter (FPS)"> First-person Shooter (FPS)
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Third-person Shooter (TPS)"> Third-person Shooter (TPS)
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Tactical Shooter"> Tactical Shooter
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Roguelike"> Roguelike
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Metroidvania"> Metroidvania
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Visual Novel"> Visual Novel
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Rhythm"> Rhythm
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Party"> Party
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Educational"> Educational
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Card Game"> Card Game
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Board Game"> Board Game
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+                  <input type="checkbox" name="genres" value="Trivia"> Trivia
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Кнопка отправки -->
+      <div style="display: flex; justify-content: center; margin-top: 20px;">
+        <button type="submit" style="width: 220px; background-color: #FFBD3F; color: black; padding: 14px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: 0.3s;">
+          Save Game Card
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  .tab-button {
+    padding: 10px 20px;
+    border: none;
+    background: none;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    color: gray;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s;
+  }
+
+  .tab-button.active {
+    color: black;
+    border-bottom: 3px solid #FFBD3F;
+    background-color: #fff8e5;
+  }
+
+  .tab-button:hover {
+    color: #FFBD3F;
+  }
+
+  .tab-content {
+    transition: all 0.3s;
+  }
+
+  /* Стили для чекбоксов */
+  input[type="checkbox"] {
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+  }
+
+  label {
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  label:hover {
+    color: #555;
+  }
+</style>
+
+<script>
+  // Скрипт для превью изображения
+  document.addEventListener('DOMContentLoaded', function() {
+    const imageUrlInput = document.getElementById('imageUrlInput');
+    const imagePreview = document.getElementById('gameImagePreview');
+    let debounceTimer;
+
+    imageUrlInput.addEventListener('input', function() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        updateImagePreview(this.value);
+      }, 500);
+    });
+
+    function updateImagePreview(url) {
+      if (!url) {
+        imagePreview.style.display = 'none';
+        return;
+      }
+
+      const tempImg = new Image();
+      tempImg.onload = function() {
+        imagePreview.src = url;
+        imagePreview.style.display = 'block';
+      };
+      tempImg.onerror = function() {
+        imagePreview.style.display = 'none';
+        console.log('Не удалось загрузить изображение');
+      };
+      tempImg.src = url;
+    }
+
+    if (imageUrlInput.value) {
+      updateImagePreview(imageUrlInput.value);
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", function() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const tab = button.getAttribute('data-tab');
+
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+
+        tabContents.forEach(content => {
+          if (content.id === 'tab-' + tab) {
+            content.style.display = tab === "addgame" ? "flex" : "block";
+          } else {
+            content.style.display = 'none';
+          }
+        });
+      });
+    });
+  });
+</script>

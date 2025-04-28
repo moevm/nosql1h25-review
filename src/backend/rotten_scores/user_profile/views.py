@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
 from django.template.defaulttags import now
 from django.utils import timezone
 from django.utils.datetime_safe import datetime
@@ -11,7 +11,7 @@ from bson.objectid import ObjectId
 from django.utils.dateparse import parse_date
 from bson import datetime as bson_datetime
 from datetime import datetime as py_datetime
-
+from django.contrib import messages
 
 client = MongoClient(settings.MONGO_DB_URI)
 db = client[settings.MONGO_DB_NAME]
@@ -52,45 +52,31 @@ def my_ratings_and_reviews(request):
     return render(request, 'profile/base_profile.html', context)
 
 
-
-
 def custom_logout(request):
     if request.user.is_authenticated:
         print(client.list_database_names())
-        # Получаем текущего пользователя и вызываем его метод logout
         user = request.user
         user.logout()
-
-        # Очищаем сессию
         request.session.flush()
-
     return redirect('core:homepage')
 
 
 def load_section(request):
     section = request.GET.get('section', 'profile')
-
     section_mapping = {
         'ratings': 'ratings.html',
         'account': 'account.html',
         'statistics': 'statistics.html',
         'admin_panel': 'admin.html'
     }
-
     template_name = f'profile/sections/{section_mapping.get(section, "ratings.html")}'
-
     try:
         return render(request, template_name)
     except:
         return HttpResponseNotFound("Section not found")
 
 
-
-
 def account(request):
-    games_collection = db['games']
-
-    # Обработка форм личных данных и пароля
     personal_form = ChangePersonalDataForm(data=request.POST or None, user=request.user)
     password_form = ChangePasswordForm(data=request.POST or None, user=request.user)
 
@@ -105,52 +91,6 @@ def account(request):
             password_form.save()
             return custom_logout(request)
 
-
-        elif form_type == 'addgame':
-            title = request.POST.get('name')
-            description = request.POST.get('description')
-            released_on = request.POST.get('released_on')
-            developer = request.POST.get('game_author')
-            publisher = request.POST.get('game_author')
-            image_url = request.POST.get('image_url')
-            platforms = request.POST.getlist('platforms')
-            genres = request.POST.getlist('genres')
-            release_date = None
-            if released_on:
-                parsed_date = parse_date(released_on)
-                if parsed_date:
-                    release_date = bson_datetime.datetime.combine(
-                        parsed_date,
-                        py_datetime.min.time()
-                    )
-            game = {
-                'title': title,
-                'description': description,
-                'developer': developer,
-                'publisher': publisher,
-                'platforms': platforms,
-                'genres': genres,
-                'imageUrl': image_url,  # Используем URL напрямую
-                'releaseDate': release_date,
-                'stats': {
-                    'userReviews': {'total': 0, 'avgRating': 0.0},
-                    'criticReviews': {'total': 0, 'avgRating': 0.0}
-                },
-                'createdAt': timezone.now(),
-                'lastModified': timezone.now()
-            }
-
-
-            try:
-                result = games_collection.insert_one(game)
-                print(f"Game saved with ID: {result.inserted_id}")
-                return redirect('account')
-            except Exception as e:
-                print(f"Error saving game: {e}")
-                # Добавьте сообщение об ошибке для пользователя
-                from django.contrib import messages
-                messages.error(request, f"Error saving game: {e}")
-
     context = {
         'personal_form': personal_form,
         'password_form': password_form,
@@ -158,8 +98,13 @@ def account(request):
     }
 
     return render(request, 'profile/base_profile.html', context)
+
+
 def statistics(request):
     user_id = request.user.id
+
+    client = MongoClient(settings.MONGO_DB_URI)
+    db = client[settings.MONGO_DB_NAME]
 
     user_reviews = list(db.user_reviews.find({"userId": user_id}))
     games_reviewed = len(user_reviews)
@@ -202,6 +147,54 @@ def statistics(request):
 
 
 def admin_panel(request):
+    games_collection = db['games']
+
+    if request.method == 'POST' and request.POST.get('form_type') == 'addgame':
+        if not request.user.is_staff:  # Проверка на админа
+            return HttpResponseForbidden("You don't have permission to add games")
+
+        title = request.POST.get('name')
+        description = request.POST.get('description')
+        released_on = request.POST.get('released_on')
+        developer = request.POST.get('game_author')
+        publisher = request.POST.get('game_author')
+        image_url = request.POST.get('image_url')
+        platforms = request.POST.getlist('platforms')
+        genres = request.POST.getlist('genres')
+
+        release_date = None
+        if released_on:
+            parsed_date = parse_date(released_on)
+            if parsed_date:
+                release_date = bson_datetime.datetime.combine(
+                    parsed_date,
+                    py_datetime.min.time()
+                )
+
+        game = {
+            'title': title,
+            'description': description,
+            'developer': developer,
+            'publisher': publisher,
+            'platforms': platforms,
+            'genres': genres,
+            'imageUrl': image_url,
+            'releaseDate': release_date,
+            'stats': {
+                'userReviews': {'total': 0, 'avgRating': 0.0},
+                'criticReviews': {'total': 0, 'avgRating': 0.0}
+            },
+            'createdAt': timezone.now(),
+            'lastModified': timezone.now()
+        }
+
+        try:
+            result = games_collection.insert_one(game)
+            messages.success(request, f"Game {title} successfully added!")
+            return redirect('profile:admin_panel')
+        except Exception as e:
+            messages.error(request, f"Error saving game: {e}")
+
     context = {
         'section_template': 'profile/sections/admin.html',
     }
