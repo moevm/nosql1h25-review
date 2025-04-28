@@ -112,7 +112,7 @@
             <label style="font-weight: 700; font-size: 16px;">Platforms:</label>
             <div class="dropdown">
               <button class="dropdown-toggle" type="button" onclick="toggleDropdown('platforms-dropdown')">
-                Select Platforms ▼
+                Select Platforms
               </button>
               <div id="platforms-dropdown" class="dropdown-content">
                 <label><input type="checkbox" name="platforms" value="PS5"> PS5</label>
@@ -130,7 +130,7 @@
             <label style="font-weight: 700; font-size: 16px;">Genres:</label>
             <div class="dropdown">
               <button class="dropdown-toggle" type="button" onclick="toggleDropdown('genres-dropdown')">
-                Select Genres ▼
+                Select Genres
               </button>
               <div id="genres-dropdown" class="dropdown-content">
                 <div style="column-count: 2; column-gap: 20px;">
@@ -425,5 +425,6 @@
     }
   }
 
+  // Добавьте обработчик события для поля URL
   document.querySelector('input[name="image_url"]').addEventListener('input', previewImageFromUrl);
 </script>
