@@ -8,6 +8,8 @@ from datetime import datetime
 client = MongoClient(settings.MONGO_DB_URI)
 db = client[settings.MONGO_DB_NAME]
 
+from django.http import HttpResponseForbidden
+
 @login_required
 def add_review(request, game_id):
     if request.method == 'POST':
@@ -21,9 +23,18 @@ def add_review(request, game_id):
         rating = int(request.POST.get('rating'))
         platform = request.POST.get('platform')
 
+        existing_review = db.user_reviews.find_one({
+            'gameId': ObjectId(game_id),
+            'userId': ObjectId(user.id),
+            'platform': platform
+        })
+
+        if existing_review:
+            return HttpResponseForbidden('You have already reviewed this game on this platform.')
+
         review = {
             'gameId': ObjectId(game_id),
-            'userId': ObjectId(user.id),  # id пользователя из Django
+            'userId': ObjectId(user.id),
             'gameTitle': game.get('title'),
             'text': text,
             'rating': rating,
@@ -35,6 +46,7 @@ def add_review(request, game_id):
         return redirect('games:game_detail', pk=game_id)
 
     return redirect('games:game_detail', pk=game_id)
+
 
 
 def edit_review(request):
