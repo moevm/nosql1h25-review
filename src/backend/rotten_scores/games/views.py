@@ -34,10 +34,30 @@ def game_detail(request, pk):
 
     game['id'] = str(game['_id'])
 
+    can_review = False
+    available_platforms = []
+
+    is_released = True 
     if 'releaseDate' in game and isinstance(game['releaseDate'], datetime):
         game['release_date_formatted'] = game['releaseDate'].strftime('%Y-%m-%d')
+        is_released = game['releaseDate'] <= datetime.now()
+    
+    if request.user.is_authenticated:
+        user_reviews = db.user_reviews.find({'gameId': ObjectId(pk), 'userId': ObjectId(request.user.id)})
+        reviewed_platforms = {review['platform'] for review in user_reviews}
+        available_platforms = [p for p in game.get('platforms', []) if p not in reviewed_platforms]
+    else:
+        available_platforms = game.get('platforms', [])
+    context = {
+        'game': game,
+        'range_1_10': range(1, 11),
+        'is_released': is_released,
+        'available_platforms': available_platforms
+ 
+    }
 
-    return render(request, 'games/game_detail.html', {'game': game})
+    return render(request, 'games/game_detail.html', context)
+
 
 logger = logging.getLogger(__name__)
 
