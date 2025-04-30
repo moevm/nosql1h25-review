@@ -13,6 +13,8 @@ from bson import json_util
 
 from . import forms
 
+from src.utils.color_code import get_color_by_score
+
 
 class HomepageView(TemplateView):
     template_name = 'core/homepage.html'
@@ -80,12 +82,16 @@ class HomepageView(TemplateView):
             else:
                 game['avg_rating_display'] = 0
 
+            if 'avg_rating' in game:
+                color_code = get_color_by_score(game['avg_rating'])
+                game['avg_rating_color'] = color_code.color
+                game['avg_rating_message'] = color_code.message
+
         context.update({
             'new_releases': new_releases,
             'best_platform_games': best_platform_games,
             'current_platform': platform,
             'all_platforms': all_platforms,
-            'page_title': 'GameScore - Агрегатор отзывов и оценок видеоигр',
         })
 
         return context
