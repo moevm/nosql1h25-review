@@ -8,15 +8,15 @@
                 <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
                     <div>
                         <h2 style="margin: 0; font-size: 1.2rem;">{{ review.game_info.0.title }}</h2>
-                        <p style="margin: 0.25rem 0; color: #aaaaaa; font-size: 0.9rem;">Reviewed – {{ review.createdAt|date:"M d, Y" }}</p>
+                        <p style="margin: 0.25rem 0; color: #aaaaaa; font-size: 0.9rem;">Reviewed – {{ review.createdAt|date:"M d, Y" }} on <strong>{{ review.platform }}</strong></p>
                     </div>
                     <div>
                         <span style="background-color: #4CAF50; color: black; font-weight: bold; padding: 0.3rem 0.8rem; border-radius: 6px;">{{ review.rating }}</span>
                     </div>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.3rem;">
-                    <button style="background-color: #FF4D4D; color: black; border: none; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">Удалить</button>
-                    <button style="background-color: #FFBD3F; color: black; border: none; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">Изменить</button>
+                    <button onclick="confirmDelete('{{ review.review_id }}')" style="background-color: #FF4D4D; color: black; border: none; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer; text-decoration: none; text-align: center;" class="delete-btn">Удалить</button>
+                    <a href="{% url 'reviews:edit_review' review_id=review.review_id %}" style="background-color: #FFBD3F; color: black; border: none; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer; text-decoration: none; text-align: center;">Изменить</a>
                 </div>
             </div>
             <div style="margin-top: 0.5rem; color: #dddddd; font-size: 0.95rem; line-height: 1.4;">
@@ -28,4 +28,30 @@
 {% else %}
     <h5>Для данной роли не предусмотрен раздел отзывов и оценок.</h5>
 {% endif %}
-
+<div id="deleteModal" style="display: none; position: fixed; top: 0; left: 0; 
+    width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000;">
+    <div style="background: #1a1a1a; color: white; width: 400px; padding: 2rem; margin: 10% auto; border-radius: 10px; position: relative;">
+        <h3>Подтверждение удаления</h3>
+        <p>Вы уверены, что хотите удалить отзыв? Это действие нельзя отменить.</p>
+        <form id="deleteForm" method="POST" action="">
+            {% csrf_token %}
+            <div style="margin-top: 1rem; display: flex; justify-content: flex-end; gap: 1rem;">
+                <button type="button" onclick="closeModal()" style="padding: 0.5rem 1rem; background-color:rgb(155, 155, 155); color: white; border: none; border-radius: 5px;">Отмена</button>
+                <button type="submit" style="padding: 0.5rem 1rem; background-color: #FF4D4D; color: white; border: none; border-radius: 5px;">Удалить</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    function confirmDelete(reviewId) {
+        const modal = document.getElementById('deleteModal');
+        const form = document.getElementById('deleteForm');
+        form.action = `/reviews/delete/${reviewId}/`; 
+        modal.style.display = 'block';
+    }
+    
+    function closeModal() {
+        document.getElementById('deleteModal').style.display = 'none';
+    }
+</script>
+    
