@@ -15,8 +15,8 @@
                     </div>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.3rem;">
-                    <button onclick="confirmDelete('{{ review.review_id }}')" style="background-color: #FF4D4D; color: black; border: none; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer; text-decoration: none; text-align: center;" class="delete-btn">Удалить</button>
                     <a href="{% url 'reviews:edit_review' review_id=review.review_id %}" style="background-color: #FFBD3F; color: black; border: none; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer; text-decoration: none; text-align: center;">Изменить</a>
+                    <button onclick="confirmDelete('{{ review.review_id }}')" style="background-color: #FF4D4D; color: black; border: none; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer; text-decoration: none; text-align: center;" class="delete-btn">Удалить</button>
                 </div>
             </div>
             <div style="margin-top: 0.5rem; color: #dddddd; font-size: 0.95rem; line-height: 1.4;">
