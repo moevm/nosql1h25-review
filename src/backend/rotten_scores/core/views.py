@@ -13,7 +13,7 @@ from bson import json_util
 
 from . import forms
 
-from src.utils.color_code import get_color_by_score
+from utils.color_code import get_color_by_score
 
 
 class HomepageView(TemplateView):

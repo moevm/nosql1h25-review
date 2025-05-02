@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
+from django.http import HttpResponseNotFound, HttpResponseForbidden
 from django.utils import timezone
 from django.conf import settings
 from django.utils.dateparse import parse_date
@@ -12,7 +12,7 @@ from pymongo import MongoClient
 
 from user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
 
-from src.utils.color_code import get_color_by_score
+from utils.color_code import get_color_by_score
 
 client = MongoClient(settings.MONGO_DB_URI)
 db = client[settings.MONGO_DB_NAME]
