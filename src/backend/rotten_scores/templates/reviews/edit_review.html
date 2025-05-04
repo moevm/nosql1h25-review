@@ -17,14 +17,28 @@
     <form method="POST">
         {% csrf_token %}
         
-        <div style="margin-bottom: 1rem;">
-            <label for="rating" style="display: block; margin-bottom: 0.5rem;">Оценка:</label>
-            <select id="rating" name="rating" required style="width: 100%; padding: 0.5rem; background-color: #2a2a2a; color: white; border: 1px solid #444; border-radius: 6px;">
+        <div class="mb-4 text-center">
+            <h4 for="rating" class="form-label">Оценка</h4>
+            <div class="d-flex justify-content-center align-items-center" id="ratingContainer">
                 {% for i in rating_choices %}
-                    <option value="{{ i }}" {% if review.rating == i %}selected{% endif %}>{{ i }}</option>
-                 {% endfor %}
-            </select>
-        </div>
+                    <label class="rating-label mx-1" style="cursor: pointer;">
+                        <input type="radio" name="rating" value="{{ i }}" class="d-none rating-input"
+                               {% if review.rating == i %}checked{% endif %} required>
+                        <span class="rating-circle" data-value="{{ i }}" style="
+                            display: inline-block;
+                            width: 40px;
+                            height: 40px;
+                            line-height: 40px;
+                            border-radius: 50%;
+                            background-color: #aaaaaa;
+                            color: white;
+                            font-weight: bold;
+                            font-size: 1rem;
+                        ">{{ i }}</span>
+                    </label>
+                {% endfor %}
+            </div>
+        </div>        
         
         <div style="margin-bottom: 1rem;">
             <label for="platform">Platform</label>
@@ -48,4 +62,43 @@
         </div>
     </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ratingInputs = document.querySelectorAll('.rating-input');
+        const ratingCircles = document.querySelectorAll('.rating-circle');
+    
+        function updateCircleColors(selectedValue) {
+            ratingCircles.forEach(circle => {
+                const circleValue = parseInt(circle.getAttribute('data-value'));
+                circle.style.backgroundColor = '#aaaaaa';
+    
+                if (circleValue <= selectedValue) {
+                    if (circleValue <= 3) {
+                        circle.style.backgroundColor = '#dc3545'; 
+                    } else if (circleValue <= 7) {
+                        circle.style.backgroundColor = '#ffc107'; 
+                    } else {
+                        circle.style.backgroundColor = '#28a745'; 
+                    }
+                }
+            });
+        }
+    
+        ratingInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                updateCircleColors(parseInt(this.value));
+            });
+        });
+    
+        // При загрузке страницы активировать начальный цвет
+        const checkedInput = document.querySelector('input[name="rating"]:checked');
+        if (checkedInput) {
+            updateCircleColors(parseInt(checkedInput.value));
+        }
+    });
+    
+</script>
 {% endblock %}
