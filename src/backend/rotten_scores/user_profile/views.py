@@ -22,7 +22,7 @@ def my_ratings_and_reviews(request):
     user_id = request.user.id
 
     data = [
-        {"$match": {"userId": user_id}},
+        {"$match": {"userId": ObjectId(user_id)}},
         {
             "$lookup": {
                 "from": "games",
@@ -33,10 +33,11 @@ def my_ratings_and_reviews(request):
         },
         {
             "$project": {
-                "_id": 0,
+                "_id": 1,
                 "text": 1,
                 "rating": 1,
                 "createdAt": 1,
+                "platform": 1,
                 "game_info.title": 1,
                 "game_info.imageUrl": 1
             }
@@ -46,7 +47,8 @@ def my_ratings_and_reviews(request):
     reviews = list(db.user_reviews.aggregate(data))
     for review in reviews:
         review['color'] = get_color_by_score(float(review['rating'])).color
-
+        review['review_id'] = str(review['_id'])
+    
     context = {
         'reviews': reviews,
         'section_template': 'profile/sections/ratings.html',

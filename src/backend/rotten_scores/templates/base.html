@@ -21,8 +21,6 @@
             text-decoration: none;
             color: inherit;
         }
-    </style>
-    <style>
         .login-input {
             width: 100%;
             padding: 0.5rem;
@@ -31,12 +29,72 @@
             box-sizing: border-box;
             margin-top: 0.25rem;
         }
+        /* Стили для сообщений */
+        .messages-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 350px;
+        }
+        .message {
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+            position: relative;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .message.success {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .message.error {
+            background-color: #FF4D4D;
+            color: white;
+        }
+        .message.info {
+            background-color: #FFBD3F;
+            color: black;
+        }
+        .message button {
+            background: none;
+            border: none;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-weight: bold;
+            color: inherit;
+            opacity: 0.7;
+        }
+        .message button:hover {
+            opacity: 1;
+        }
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(-20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
     </style>
 </head>
 <body>
 
     {% include 'includes/header.html' %}
 
+    <!-- Сообщения для пользователя -->
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+            {{ message }}
+            <button onclick="this.parentElement.style.display='none';">
+                &times;
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 
     <main style="min-height: 70vh; padding: 2rem;">
         {% block content %}
@@ -75,7 +133,22 @@
                 }
             }
         });
-    </script>
 
+        // Автоматическое скрытие сообщений через 5 секунд
+        document.addEventListener('DOMContentLoaded', function() {
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(function(message) {
+                setTimeout(function() {
+                    message.style.opacity = '0';
+                    message.style.transform = 'translateY(-20px)';
+                    message.style.transition = 'opacity 0.5s, transform 0.5s';
+                    setTimeout(function() {
+                        message.style.display = 'none';
+                    }, 500);
+                }, 5000);
+            });
+        });
+    </script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

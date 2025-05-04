@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование отзыва{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem; max-width: 700px; margin: 2rem auto; background-color: #1a1a1a; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); color: white;">
+    <h1 style="margin-bottom: 1.5rem;">Редактирование отзыва</h1>
+    
+    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+        <img src="{{ game.imageUrl }}" alt="Game Image" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+        <div>
+            <h2 style="margin: 0; font-size: 1.2rem;">{{ game.title }}</h2>
+            <p style="margin: 0.25rem 0; color: #aaaaaa; font-size: 0.9rem;">Изначально опубликовано: {{ review.createdAt|date:"M d, Y" }} on <strong>{{ review.platform }}</strong></p>
+        </div>
+    </div>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="mb-4 text-center">
+            <h4 for="rating" class="form-label">Оценка</h4>
+            <div class="d-flex justify-content-center align-items-center" id="ratingContainer">
+                {% for i in rating_choices %}
+                    <label class="rating-label mx-1" style="cursor: pointer;">
+                        <input type="radio" name="rating" value="{{ i }}" class="d-none rating-input"
+                               {% if review.rating == i %}checked{% endif %} required>
+                        <span class="rating-circle" data-value="{{ i }}" style="
+                            display: inline-block;
+                            width: 40px;
+                            height: 40px;
+                            line-height: 40px;
+                            border-radius: 50%;
+                            background-color: #aaaaaa;
+                            color: white;
+                            font-weight: bold;
+                            font-size: 1rem;
+                        ">{{ i }}</span>
+                    </label>
+                {% endfor %}
+            </div>
+        </div>        
+        
+        <div style="margin-bottom: 1rem;">
+            <label for="platform">Platform</label>
+            <select name="platform" id="platform" class="form-select" required>
+                {% for platform in available_platforms %}
+                    <option value="{{ platform }}" {% if review.platform == platform %}selected{% endif %}>
+                    {{ platform }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label for="text" style="display: block; margin-bottom: 0.5rem;">Текст отзыва:</label>
+            <textarea id="text" name="text" rows="8" required style="width: 100%; padding: 0.5rem; background-color: #2a2a2a; color: white; border: 1px solid #444; border-radius: 6px;">{{ review.text }}</textarea>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <a href="{% url 'profile:my_rating_and_reviews' %}" style="background-color: #555555; color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 6px;">Отмена</a>
+            <button type="submit" style="background-color: #FFBD3F; color: black; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: bold;">Сохранить изменения</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ratingInputs = document.querySelectorAll('.rating-input');
+        const ratingCircles = document.querySelectorAll('.rating-circle');
+    
+        function updateCircleColors(selectedValue) {
+            ratingCircles.forEach(circle => {
+                const circleValue = parseInt(circle.getAttribute('data-value'));
+                circle.style.backgroundColor = '#aaaaaa';
+    
+                if (circleValue <= selectedValue) {
+                    if (circleValue <= 3) {
+                        circle.style.backgroundColor = '#dc3545'; 
+                    } else if (circleValue <= 7) {
+                        circle.style.backgroundColor = '#ffc107'; 
+                    } else {
+                        circle.style.backgroundColor = '#28a745'; 
+                    }
+                }
+            });
+        }
+    
+        ratingInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                updateCircleColors(parseInt(this.value));
+            });
+        });
+    
+        // При загрузке страницы активировать начальный цвет
+        const checkedInput = document.querySelector('input[name="rating"]:checked');
+        if (checkedInput) {
+            updateCircleColors(parseInt(checkedInput.value));
+        }
+    });
+    
+</script>
+{% endblock %}
