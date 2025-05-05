@@ -1,3 +1,5 @@
+from utils.color_code import get_color_by_score
+
 from django.http import HttpResponse
 from django.http import JsonResponse
 from .models import Game
@@ -14,8 +16,11 @@ from bson.objectid import ObjectId
 client = MongoClient(settings.MONGO_DB_URI)
 db = client[settings.MONGO_DB_NAME]
 
+
 def game_list(request):
     return HttpResponse("Заглушка лист игр")
+
+
 #     query = request.GET.get('q', '')
 #     if query:
 #         games = Game.objects.filter(title__icontains=query)
@@ -37,11 +42,11 @@ def game_detail(request, pk):
     can_review = False
     available_platforms = []
 
-    is_released = True 
+    is_released = True
     if 'releaseDate' in game and isinstance(game['releaseDate'], datetime):
         game['release_date_formatted'] = game['releaseDate'].strftime('%Y-%m-%d')
         is_released = game['releaseDate'] <= datetime.now()
-    
+
     if request.user.is_authenticated:
         user_reviews = db.user_reviews.find({'gameId': ObjectId(pk), 'userId': ObjectId(request.user.id)})
         reviewed_platforms = {review['platform'] for review in user_reviews}
@@ -53,13 +58,14 @@ def game_detail(request, pk):
         'range_1_10': range(1, 11),
         'is_released': is_released,
         'available_platforms': available_platforms
- 
+
     }
 
     return render(request, 'games/game_detail.html', context)
 
 
 logger = logging.getLogger(__name__)
+
 
 def search_games(request):
     try:
@@ -146,13 +152,16 @@ def search_games(request):
                     logger.error(f"Error formatting date: {str(e)}")
                     formatted_date = 'N/A'
 
+            critic_rating = game.get('stats', {}).get('criticReviews', {}).get('avgRating', 'N/A')
+            color = get_color_by_score(critic_rating).color if critic_rating != 'N/A' else None
             game_data = {
                 'id': str(game['_id']),
                 'title': game.get('title', ''),
                 'imageUrl': game.get('imageUrl', ''),
-                'releaseDate': formatted_date,  # Используем отформатированную дату
-                'criticRating': game.get('stats', {}).get('criticReviews', {}).get('avgRating', 'N/A'),
+                'releaseDate': formatted_date,
+                'criticRating': critic_rating,
                 'genres': ', '.join(game.get('genres', [])),
+                'color': color
             }
             games.append(game_data)
 

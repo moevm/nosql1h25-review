@@ -10,7 +10,8 @@
             </div>
 
             <nav style="margin-right: auto;">
-                <a href="{% url 'games:game_list' %}" style="color: #FFBD3F; text-decoration: none; font-size: 1.2rem; margin-right: 2rem;">Games</a>
+                <a href="{% url 'games:game_list' %}"
+                   style="color: #FFBD3F; text-decoration: none; font-size: 1.2rem; margin-right: 2rem;">Games</a>
             </nav>
         </div>
         <!-- Поиск и кнопка -->
@@ -18,24 +19,35 @@
             <form method="get" action="{% url 'games:game_list' %}" style="position: relative;">
                 <input id="search-input" name="q" type="text" placeholder="Search"
                        style="width: 200px; padding: 0.5rem 2rem 0.5rem 0.75rem; border-radius: 0.25rem; border: none;">
-                <div id="search-results" style="position: absolute; background: white; width: 100%; z-index: 1000; display: none;"></div>
+                <div id="search-results"
+                     style="position: absolute; background: white; width: 100%; z-index: 1000; display: none;"></div>
                 <img src="{% static 'img/search.png' %}" alt="Search"
                      style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px;">
             </form>
 
             {% if user.is_authenticated %}
-                <div class="user-icon" style="cursor: pointer; position: relative;">
-                    <img src="{% static 'img/user.png' %}" alt="User" style="width: 32px; height: 32px; border-radius: 50%;">
-                    <div class="user-dropdown" style="display: none; position: absolute; right: 0; top: 100%; background-color: #1a1a1a; border-radius: 4px; width: 150px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 100; margin-top: 5px;">
-                        <div style="padding: 10px; border-bottom: 1px solid #333; text-align: center; font-weight: bold;">{{ user.username }}</div>
-                        <a href="{% url 'profile:my_rating_and_reviews' %}" style="display: block; padding: 10px; color: white; text-decoration: none;">Profile</a>
-                        {% if user.role == 'admin' %}
-                            <a href="{% url 'core:database' %}" style="display: block; padding: 10px; color: white; text-decoration: none;">Database</a>
-                        {% endif %}
+            <div class="user-icon" style="cursor: pointer; position: relative;">
+                <img src="{% static 'img/user.png' %}" alt="User"
+                     style="width: 32px; height: 32px; border-radius: 50%;">
+                <div class="user-dropdown"
+                     style="display: none; position: absolute; right: 0; top: 100%; background-color: #1a1a1a; border-radius: 4px; width: 150px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 100; margin-top: 5px;">
+                    <div style="padding: 10px; border-bottom: 1px solid #333; text-align: center; font-weight: bold;">
+                        {{ user.username }}
                     </div>
-            {% else %}
-            <button id="authButton" style="background-color: #FFBD3F; color: black; border: none; border-radius: 0.25rem; padding: 0.5rem 1.5rem; cursor: pointer; font-weight: bold; white-space: nowrap;">Authorization</button>
-            {% endif %}
+                    <a href="{% url 'profile:my_rating_and_reviews' %}"
+                       style="display: block; padding: 10px; color: white; text-decoration: none;">Profile</a>
+                    {% if user.role == 'admin' %}
+                    <a href="{% url 'core:database' %}"
+                       style="display: block; padding: 10px; color: white; text-decoration: none;">Database</a>
+                    {% endif %}
+                </div>
+                {% else %}
+                <button id="authButton"
+                        style="background-color: #FFBD3F; color: black; border: none; border-radius: 0.25rem; padding: 0.5rem 1.5rem; cursor: pointer; font-weight: bold; white-space: nowrap;">
+                    Authorization
+                </button>
+                {% endif %}
+            </div>
         </div>
     </div>
 </header>
@@ -51,7 +63,6 @@
         const authButton = document.getElementById('authButton');
         const closeModal = document.querySelector('.close-modal');
         const loginForm = document.getElementById('loginForm');
-
 
 
         // Open modal when clicking the auth button
@@ -178,13 +189,13 @@
                             padding: 12px 15px;
                             border-bottom: 1px solid #eee;
                             cursor: pointer;
-                            background-color: white;
+                            background-color: {{ game.color }};
                             min-height: 85px;
                             box-sizing: border-box;
                             display: flex;
                             align-items: center;
                         `;
-
+                                console.log(game.color)
                                 // Оптимальное количество символов (40)
                                 const maxLength = 40;
                                 const displayTitle = game.title.length > maxLength
@@ -243,8 +254,9 @@
                                         <div style="
                                             font-size: 16px;
                                             font-weight: bold;
-                                            color: #333;
+                                            color: ${ game.color || '#000000'};
                                             margin-left: 10px;
+                                            margin-right: 10px;
                                         ">
                                             ${game.criticRating || 'N/A'}
                                         </div>

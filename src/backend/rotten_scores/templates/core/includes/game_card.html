@@ -4,37 +4,20 @@
              class="card-img-top rounded-top" alt="{{ game.title }}">
 
         <div class="card-body p-2 d-flex flex-column justify-content-between">
-            <h6 class="card-title mb-2 text-truncate">{{ game.title }}</h6>
+            <h5 class="card-title mb-2 text-truncate">{{ game.title }}</h5>
 
             {% if game.release_date %}
             <p class="card-text mb-2"><small class="text-muted">{{ game.release_date|date:"d M Y" }}</small></p>
             {% endif %}
 
-            <!-- Рейтинг аккуратно снизу справа -->
-            <div class="d-flex justify-content-end">
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 text-truncate" style="color: #6c757d; font-weight: bold;">{{ game.avg_rating_message }}</h6>
                 <span style="
                     font-size: 0.95rem;
                     font-weight: 600;
                     padding: 0.4rem 0.7rem;
                     border-radius: 0.5rem;
-                    background-color:
-                        {% if game.avg_rating_display >= 85 %}
-                            #28a745
-                        {% elif game.avg_rating_display >= 70 %}
-                            #ffc107
-                        {% elif game.avg_rating_display %}
-                            #dc3545
-                        {% else %}
-                            gray
-                        {% endif %}
-                    ;
-                    color:
-                        {% if game.avg_rating_display >= 70 and game.avg_rating_display < 85 %}
-                            #212529
-                        {% else %}
-                            white
-                        {% endif %}
-                    ;
+                    background-color: {{ game.avg_rating_color }};
                 ">
                     {% if game.avg_rating_display %}
                         {{ game.avg_rating_display }}

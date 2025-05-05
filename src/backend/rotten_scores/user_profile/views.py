@@ -1,17 +1,18 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseForbidden
-from django.template.defaulttags import now
+from django.http import HttpResponseNotFound, HttpResponseForbidden
 from django.utils import timezone
-from django.utils.datetime_safe import datetime
-from djongo.database import Binary
-from pymongo import MongoClient
 from django.conf import settings
-from user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
-from bson.objectid import ObjectId
 from django.utils.dateparse import parse_date
-from bson import datetime as bson_datetime
-from datetime import datetime as py_datetime
 from django.contrib import messages
+
+from bson import datetime as bson_datetime, ObjectId
+from datetime import datetime as py_datetime
+
+from pymongo import MongoClient
+
+from user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
+
+from utils.color_code import get_color_by_score
 
 client = MongoClient(settings.MONGO_DB_URI)
 db = client[settings.MONGO_DB_NAME]
@@ -44,9 +45,8 @@ def my_ratings_and_reviews(request):
     ]
 
     reviews = list(db.user_reviews.aggregate(data))
-    
-    # Преобразуем _id в строку для каждого отзыва
     for review in reviews:
+        review['color'] = get_color_by_score(float(review['rating'])).color
         review['review_id'] = str(review['_id'])
     
     context = {

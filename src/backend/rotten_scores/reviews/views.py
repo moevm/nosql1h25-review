@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden, HttpResponse
+from django.conf import settings
+
 from django.contrib import messages
 from bson import ObjectId
 from pymongo import MongoClient
@@ -10,14 +13,13 @@ from django.conf import settings
 client = MongoClient(settings.MONGO_DB_URI)
 db = client[settings.MONGO_DB_NAME]
 
-from django.http import HttpResponseForbidden
 
 @login_required
 def add_review(request, game_id):
     if request.method == 'POST':
         user = request.user
         game = db.games.find_one({'_id': ObjectId(game_id)})
-       
+
         if not game:
             return render(request, '404.html', status=404)
 
@@ -41,8 +43,8 @@ def add_review(request, game_id):
             'text': text,
             'rating': rating,
             'platform': platform,
-            'createdAt': datetime.utcnow(),
-            'lastModified': datetime.utcnow()
+            'createdAt': datetime.now(),
+            'lastModified': datetime.now()
         }
         db.user_reviews.insert_one(review)
         return redirect('games:game_detail', pk=game_id)
@@ -131,6 +133,5 @@ def delete_review(request, review_id):
         messages.error(request, f'Произошла ошибка при удалении отзыва: {str(e)}')
         return redirect('profile:my_rating_and_reviews')
     
-
 def review_list(request):
     return HttpResponse("Заглушка")
