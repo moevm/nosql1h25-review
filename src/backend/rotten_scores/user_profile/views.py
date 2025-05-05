@@ -5,7 +5,7 @@ from django.conf import settings
 from django.utils.dateparse import parse_date
 from django.contrib import messages
 
-from bson import datetime as bson_datetime
+from bson import datetime as bson_datetime, ObjectId
 from datetime import datetime as py_datetime
 
 from pymongo import MongoClient
