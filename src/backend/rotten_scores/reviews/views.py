@@ -47,6 +47,15 @@ def add_review(request, game_id):
             'lastModified': datetime.now()
         }
         db.user_reviews.insert_one(review)
+        db.games.update_one(
+            {'_id': ObjectId(game_id)},
+            {'$push': {
+                'recentUserReviews': {
+                    '$each': [review],
+                    '$position': 0
+                }
+            }}
+        )
         return redirect('games:game_detail', pk=game_id)
 
     return redirect('games:game_detail', pk=game_id)
