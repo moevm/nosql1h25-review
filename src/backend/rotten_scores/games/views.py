@@ -37,7 +37,24 @@ def game_detail(request, pk):
     if not game:
         return render(request, '404.html', status=404)
 
+    critic_reviews = []
+    user_reviews = []
+
     game['id'] = str(game['_id'])
+
+    if 'recentCriticReviews' in game:
+        critic_reviews = game['recentCriticReviews']
+        for review in critic_reviews:
+            score = review['rating']
+            review['score_color'] = get_color_by_score(int(score)).color
+
+    if 'recentUserReviews' in game:
+        user_reviews = game['recentUserReviews']
+        for review in user_reviews:
+            user = db.users.find_one({"_id": review["userId"]})
+            score = review['rating']
+            review['username'] = user['username']
+            review['score_color'] = get_color_by_score(float(score)).color
 
     can_review = False
     available_platforms = []
@@ -48,17 +65,20 @@ def game_detail(request, pk):
         is_released = game['releaseDate'] <= datetime.now()
 
     if request.user.is_authenticated:
-        user_reviews = db.user_reviews.find({'gameId': ObjectId(pk), 'userId': ObjectId(request.user.id)})
-        reviewed_platforms = {review['platform'] for review in user_reviews}
+        cursor = db.user_reviews.find({'gameId': ObjectId(pk), 'userId': ObjectId(request.user.id)})
+        user_reviews_by_current_user = list(cursor)
+        reviewed_platforms = {review['platform'] for review in user_reviews_by_current_user}
         available_platforms = [p for p in game.get('platforms', []) if p not in reviewed_platforms]
     else:
         available_platforms = game.get('platforms', [])
+
     context = {
         'game': game,
+        'critic_reviews': critic_reviews,
+        'user_reviews': user_reviews,
         'range_1_10': range(1, 11),
         'is_released': is_released,
-        'available_platforms': available_platforms
-
+        'available_platforms': available_platforms,
     }
 
     return render(request, 'games/game_detail.html', context)

@@ -2,6 +2,7 @@
 
 {% block title %}{{ game.title }} | Game Detail{% endblock %}
 
+
 {% block content %}
 <div class="container">
     <div class="row">
@@ -32,12 +33,71 @@
                       </button>
                   {% endif %}
               </div>
-              {% elif not is_released %}
-              <div class="mt-3">
-                  <p class="text-muted"><i>Reviews will be available after the game release.</i></p>
-              </div>
-          {% endif %}
         </div>
+        {% if critic_reviews.0 %}
+          <div class="row mt-5">
+              <div class="col-12">
+                <h4 class="fw-bold">CRITIC REVIEWS</h4>
+              </div>
+              {% for review in critic_reviews %}
+              <div class="col-md-4 mb-3">
+                <div class="border p-3 rounded h-100">
+                  <div class="d-flex align-items-center mb-2">
+                        <span style="background-color: {{ review.score_color }}; color: black; font-weight: bold; padding: 0.3rem 0.8rem; border-radius: 6px; margin-right: 10px;">
+                            {{ review.rating }}
+                        </span>
+                        <strong>{{ review.publication }}</strong>
+                  </div>
+                  <p class="mb-2">{{ review.text|truncatechars:100 }}</p>
+                  <a href="{{ review.fullReviewLink }}" target="_blank" class="small text-decoration-underline">FULL REVIEW</a>
+                  <div class="d-flex justify-content-between align-items-center mt-2 small">
+                    <span class="text-muted">{{ review.createdAt }}</span>
+                    <span class="fw-bold">{{ review.platforms.0 }}</span>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+            <div class="col-12">
+                <div class="text-center text-muted mt-5 mb-5">
+                  <i>There are no critic reviews yet :(</i>
+                </div>
+        {% endif %}
+        {% if user_reviews.0 %}
+          <div class="row mt-5">
+              <div class="col-12">
+                <h4 class="fw-bold">USER REVIEWS</h4>
+              </div>
+              {% for review in user_reviews %}
+              <div class="col-md-4 mb-3">
+                <div class="border p-3 rounded h-100">
+                  <div class="d-flex align-items-center mb-2">
+                        <span style="background-color: {{ review.score_color }}; color: black; font-weight: bold; padding: 0.3rem 0.8rem; border-radius: 6px; margin-right: 10px;">
+                            {{ review.rating }}
+                        </span>
+                        <strong>{{ review.username }}</strong>
+                  </div>
+                  <p class="mb-2">{{ review.text|truncatechars:100 }}</p>
+                    <button type="button" class="btn btn-dark btn-sm" disabled>Read more</button>
+                  <div class="d-flex justify-content-between align-items-center mt-2 small">
+                    <span class="text-muted">{{ review.createdAt }}</span>
+                    <span class="fw-bold">{{ review.platform }}</span>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+            <div class="col-12">
+                <div class="text-center text-muted mt-5 mb-5">
+                  <i>There are no user reviews yet :(</i>
+                </div>
+        {% endif %}
+        </div>
+          {% elif not is_released %}
+          <div class="mt-3">
+              <p class="text-muted"><i>Reading and writing reviews will be available after the game release.</i></p>
+          </div>
+          {% endif %}
     </div>
 </div>
 
@@ -51,9 +111,9 @@
             <h5 class="modal-title" id="addReviewModalLabel">Add My Review</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          
+
           <div class="modal-body">
-  
+
             <!-- Игра -->
             <div class="d-flex align-items-center mb-4">
               <img src="{{ game.imageUrl|default:'https://via.placeholder.com/80x120?text=No+Image' }}"
@@ -64,11 +124,11 @@
                 {% for platform in available_platforms %}
                   <option value="{{ platform }}">{{ platform }}</option>
                 {% endfor %}
-              
+
                 </select>
               </div>
             </div>
-  
+
             <div class="mb-4 text-center">
               <h4 for="rating" class="form-label">My Score</h4>
               <div class="d-flex justify-content-center align-items-center" id="ratingContainer">
@@ -90,23 +150,23 @@
                 {% endfor %}
               </div>
             </div>
-  
+
             <div class="mb-3">
               <label for="reviewText" class="form-label">Write a review</label>
-              <textarea 
-                class="form-control" 
-                id="reviewText" 
-                name="text" 
-                rows="5" 
+              <textarea
+                class="form-control"
+                id="reviewText"
+                name="text"
+                rows="5"
                 maxlength="500"
-                placeholder="Write your review here..." 
+                placeholder="Write your review here..."
                 required
               ></textarea>
               <div class="form-text text-end"><span id="charCount">0</span>/500 characters</div>
             </div>
-  
+
           </div>
-          
+
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" id="cancelButton" data-bs-dismiss="modal">Cancel</button>
             <button type="submit" class="btn btn-primary">Post</button>
@@ -115,7 +175,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Скрипт для подсчета символов, обработки рейтинга и сброса формы -->
   <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -140,41 +200,41 @@
     reviewText.addEventListener('input', function() {
       charCount.textContent = reviewText.value.length;
     });
-    
+
     ratingInputs.forEach(input => {
       input.addEventListener('change', function() {
         const selectedValue = parseInt(this.value);
-        
+
         ratingCircles.forEach(circle => {
           const circleValue = parseInt(circle.getAttribute('data-value'));
-          
+
           circle.style.backgroundColor = '#aaaaaa';
-          
+
           if (circleValue <= selectedValue) {
             if (circleValue <= 4) {
-              circle.style.backgroundColor = '#dc3545'; 
+              circle.style.backgroundColor = '#dc3545';
             } else if (circleValue <= 7) {
-              circle.style.backgroundColor = '#ffc107'; 
+              circle.style.backgroundColor = '#ffc107';
             } else {
-              circle.style.backgroundColor = '#28a745'; 
+              circle.style.backgroundColor = '#28a745';
             }
           }
         });
       });
     });
-    
+
     // Сброс формы при закрытии модального окна
     function resetForm() {
       reviewForm.reset();
       charCount.textContent = '0';
-      
+
       ratingCircles.forEach(circle => {
         circle.style.backgroundColor = '#aaaaaa';
       });
     }
-    
+
     cancelButton.addEventListener('click', resetForm);
-    
+
     reviewModal.addEventListener('hidden.bs.modal', resetForm);
   });
   </script>
