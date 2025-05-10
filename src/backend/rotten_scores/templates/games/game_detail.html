@@ -29,37 +29,6 @@
                 <div class="card mb-3 p-3 shadow-sm">
                     <p>{{ game.description }}</p>
                 </div>
-                {% if average_score > 0 %}
-                    <div class="d-flex justify-content-center align-items-center mb-3">
-                        <span style="
-                            font-family: 'Arial', sans-serif;
-                            font-weight: bold;
-                            font-size: 1.5rem;
-                            margin-right: 12px;
-                            color: #333;
-                            letter-spacing: 0.5px;
-                        ">
-                            Critic Score
-                        </span>
-
-                        <span style="
-                            background-color: {{ average_score_color }};
-                            color: black;
-                            font-weight: bold;
-                            padding: 0.6rem 1.2rem;
-                            border-radius: 8px;
-                            font-size: 1.5rem;
-                            margin-right: 12px;
-                        ">
-                            {{ average_score }}
-                        </span>
-
-                        <i class="bi bi-star-fill text-warning" style="font-size: 1.6rem;"></i>
-                    </div>
-                {% elif is_released %}
-                    <i>There are no average critic score yet :(</i>
-                {% endif %}
-
                 {% if user.role != 'admin' and is_released %}
                     <div class="card p-3 shadow-sm mb-3">
                         {% if user.is_authenticated %}
@@ -83,6 +52,39 @@
                 {% endif %}
             </div>
         </div>
+
+        {% if average_score > 0 %}
+            <div class="card p-4 mb-4" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 500px; margin: 40px auto 0;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0" style="font-weight: bold;">Reviews</h4>
+                    <a class="text-decoration-none text-muted" style="font-size: 0.9rem;">See all</a>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <div style="font-size: 1.1rem; font-weight: 500;">
+                        {{ average_score_message }}
+                    </div>
+
+                    <div class="d-flex align-items-center">
+                        <span style="
+                            background-color: {{ average_score_color }};
+                            color: black;
+                            font-weight: bold;
+                            padding: 0.6rem 1.2rem;
+                            border-radius: 8px;
+                            font-size: 1.3rem;
+                            margin-right: 8px;
+                        ">
+                            {{ average_score }}
+                        </span>
+                        <i class="bi bi-star-fill text-warning" style="font-size: 1.5rem;"></i>
+                    </div>
+                </div>
+            </div>
+        {% elif is_released %}
+            <i>There are no average critic score yet :(</i>
+        {% endif %}
+
 
         {% if critic_reviews.0 %}
           <div class="row mt-5">

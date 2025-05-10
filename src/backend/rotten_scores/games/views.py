@@ -74,9 +74,11 @@ def game_detail(request, pk):
 
     average_score = 0
     average_score_color = None
+    average_score_message = None
     if 'stats' in game and 'criticReviews' in game['stats']:
         average_score = game['stats']['criticReviews']['avgRating']
         average_score_color = get_color_by_score(int(average_score)).color
+        average_score_message = get_color_by_score(int(average_score)).message
 
     context = {
         'game': game,
@@ -86,7 +88,8 @@ def game_detail(request, pk):
         'is_released': is_released,
         'available_platforms': available_platforms,
         'average_score': average_score,
-        'average_score_color': average_score_color
+        'average_score_color': average_score_color,
+        'average_score_message': average_score_message
     }
 
     return render(request, 'games/game_detail.html', context)
