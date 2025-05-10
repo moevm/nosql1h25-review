@@ -6,34 +6,84 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-md-4">
-            <img src="{{ game.imageUrl|default:'https://via.placeholder.com/400x600' }}" class="img-fluid" alt="{{ game.title }}">
-        </div>
-        <div class="col-md-8">
+    <div class="col-md-6">
+    <img src="{{ game.imageUrl|default:'https://via.placeholder.com/800x600' }}"
+         alt="{{ game.title }}"
+         class="rounded shadow"
+         style="width: 460px; height: auto; display: block;">
+    </div>
+
+    <div class="col-md-6">
+        <div class="card mb-3 p-3 shadow-sm">
             <h1>{{ game.title }}</h1>
-            <p><strong>Developer:</strong> {{ game.developer }}</p>
-            <p><strong>Publisher:</strong> {{ game.publisher }}</p>
-            <p><strong>Release Date:</strong> {{ game.release_date_formatted }}</p>
-            <p><strong>Genres:</strong> {{ game.genres|join:", " }}</p>
-            <p><strong>Platforms:</strong> {{ game.platforms|join:", " }}</p>
-            <p>{{ game.description }}</p>
-            {% if user.role != 'admin' and is_released %}
-              <div class="mt-3">
-                  {% if user.is_authenticated %}
-                      {% if available_platforms %}
-                          <button type="button" class="btn" style="background-color: #FFBD3F; color: black;" data-bs-toggle="modal" data-bs-target="#addReviewModal">
-                              Add my review
-                          </button>
-                      {% else %}
-                          <p class="text-muted"><i>You have already reviewed this game on all available platforms.</i></p>
-                      {% endif %}
-                  {% else %}
-                      <button type="button" class="btn" style="background-color: #FFBD3F; color: black;" id="authButton2">
-                          Authorization
-                      </button>
-                  {% endif %}
-              </div>
         </div>
+                <div class="card mb-2 p-3 shadow-sm">
+                    <p><strong>Developer:</strong> {{ game.developer }}</p>
+                    {% if game.publisher %}
+                        <p><strong>Publisher:</strong> {{ game.publisher }}</p>
+                    {% endif %}
+                    <p><strong>Released On:</strong> {{ game.release_date_formatted }}</p>
+                    <p><strong>Genres:</strong> {{ game.genres|join:", " }}</p>
+                    <p><strong>Platforms:</strong> {{ game.platforms|join:", " }}</p>
+                </div>
+                <div class="card mb-3 p-3 shadow-sm">
+                    <p>{{ game.description }}</p>
+                </div>
+                {% if average_score > 0 %}
+                    <div class="d-flex justify-content-center align-items-center mb-3">
+                        <span style="
+                            font-family: 'Arial', sans-serif;
+                            font-weight: bold;
+                            font-size: 1.5rem;
+                            margin-right: 12px;
+                            color: #333;
+                            letter-spacing: 0.5px;
+                        ">
+                            Critic Score
+                        </span>
+
+                        <span style="
+                            background-color: {{ average_score_color }};
+                            color: black;
+                            font-weight: bold;
+                            padding: 0.6rem 1.2rem;
+                            border-radius: 8px;
+                            font-size: 1.5rem;
+                            margin-right: 12px;
+                        ">
+                            {{ average_score }}
+                        </span>
+
+                        <i class="bi bi-star-fill text-warning" style="font-size: 1.6rem;"></i>
+                    </div>
+                {% elif is_released %}
+                    <i>There are no average critic score yet :(</i>
+                {% endif %}
+
+                {% if user.role != 'admin' and is_released %}
+                    <div class="card p-3 shadow-sm mb-3">
+                        {% if user.is_authenticated %}
+                            {% if available_platforms %}
+                                <button type="button" class="btn btn-warning text-dark" data-bs-toggle="modal" data-bs-target="#addReviewModal">
+                                    Add my review
+                                </button>
+                            {% else %}
+                                <p class="text-muted mb-0"><i>You have already reviewed this game on all available platforms.</i></p>
+                            {% endif %}
+                        {% else %}
+                            <button type="button" class="btn btn-warning text-dark" id="authButton2">
+                                Authorization
+                            </button>
+                        {% endif %}
+                    </div>
+                {% elif not is_released %}
+                    <div class="mt-3">
+                        <p class="text-muted"><i>Reading and writing reviews will be available after the game release.</i></p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
         {% if critic_reviews.0 %}
           <div class="row mt-5">
               <div class="col-12">
@@ -57,12 +107,13 @@
                 </div>
               </div>
               {% endfor %}
-            {% else %}
+        {% elif is_released %}
             <div class="col-12">
                 <div class="text-center text-muted mt-5 mb-5">
                   <i>There are no critic reviews yet :(</i>
                 </div>
         {% endif %}
+
         {% if user_reviews.0 %}
           <div class="row mt-5">
               <div class="col-12">
@@ -86,18 +137,12 @@
                 </div>
               </div>
               {% endfor %}
-            {% else %}
+        {% elif is_released %}
             <div class="col-12">
                 <div class="text-center text-muted mt-5 mb-5">
                   <i>There are no user reviews yet :(</i>
                 </div>
         {% endif %}
-        </div>
-          {% elif not is_released %}
-          <div class="mt-3">
-              <p class="text-muted"><i>Reading and writing reviews will be available after the game release.</i></p>
-          </div>
-          {% endif %}
     </div>
 </div>
 

@@ -61,7 +61,7 @@ def game_detail(request, pk):
 
     is_released = True
     if 'releaseDate' in game and isinstance(game['releaseDate'], datetime):
-        game['release_date_formatted'] = game['releaseDate'].strftime('%Y-%m-%d')
+        game['release_date_formatted'] = game['releaseDate'].strftime('%b %d, %Y')
         is_released = game['releaseDate'] <= datetime.now()
 
     if request.user.is_authenticated:
@@ -72,6 +72,12 @@ def game_detail(request, pk):
     else:
         available_platforms = game.get('platforms', [])
 
+    average_score = 0
+    average_score_color = None
+    if 'stats' in game and 'criticReviews' in game['stats']:
+        average_score = game['stats']['criticReviews']['avgRating']
+        average_score_color = get_color_by_score(int(average_score)).color
+
     context = {
         'game': game,
         'critic_reviews': critic_reviews,
@@ -79,6 +85,8 @@ def game_detail(request, pk):
         'range_1_10': range(1, 11),
         'is_released': is_released,
         'available_platforms': available_platforms,
+        'average_score': average_score,
+        'average_score_color': average_score_color
     }
 
     return render(request, 'games/game_detail.html', context)
