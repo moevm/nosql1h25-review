@@ -37,28 +37,59 @@ def game_detail(request, pk):
     if not game:
         return render(request, '404.html', status=404)
 
+    critic_reviews = []
+    user_reviews = []
+
     game['id'] = str(game['_id'])
+
+    if 'recentCriticReviews' in game:
+        critic_reviews = game['recentCriticReviews']
+        for review in critic_reviews:
+            score = review['rating']
+            review['score_color'] = get_color_by_score(int(score)).color
+
+    if 'recentUserReviews' in game:
+        user_reviews = game['recentUserReviews']
+        for review in user_reviews:
+            user = db.users.find_one({"_id": review["userId"]})
+            score = review['rating']
+            review['username'] = user['username']
+            review['score_color'] = get_color_by_score(float(score)).color
 
     can_review = False
     available_platforms = []
 
     is_released = True
     if 'releaseDate' in game and isinstance(game['releaseDate'], datetime):
-        game['release_date_formatted'] = game['releaseDate'].strftime('%Y-%m-%d')
+        game['release_date_formatted'] = game['releaseDate'].strftime('%b %d, %Y')
         is_released = game['releaseDate'] <= datetime.now()
 
     if request.user.is_authenticated:
-        user_reviews = db.user_reviews.find({'gameId': ObjectId(pk), 'userId': ObjectId(request.user.id)})
-        reviewed_platforms = {review['platform'] for review in user_reviews}
+        cursor = db.user_reviews.find({'gameId': ObjectId(pk), 'userId': ObjectId(request.user.id)})
+        user_reviews_by_current_user = list(cursor)
+        reviewed_platforms = {review['platform'] for review in user_reviews_by_current_user}
         available_platforms = [p for p in game.get('platforms', []) if p not in reviewed_platforms]
     else:
         available_platforms = game.get('platforms', [])
+
+    average_score = 0
+    average_score_color = None
+    average_score_message = None
+    if 'stats' in game and 'criticReviews' in game['stats']:
+        average_score = game['stats']['criticReviews']['avgRating']
+        average_score_color = get_color_by_score(int(average_score)).color
+        average_score_message = get_color_by_score(int(average_score)).message
+
     context = {
         'game': game,
+        'critic_reviews': critic_reviews,
+        'user_reviews': user_reviews,
         'range_1_10': range(1, 11),
         'is_released': is_released,
-        'available_platforms': available_platforms
-
+        'available_platforms': available_platforms,
+        'average_score': average_score,
+        'average_score_color': average_score_color,
+        'average_score_message': average_score_message
     }
 
     return render(request, 'games/game_detail.html', context)
