@@ -52,9 +52,13 @@ def game_detail(request, pk):
         user_reviews = game['recentUserReviews']
         for review in user_reviews:
             user = db.users.find_one({"_id": review["userId"]})
-            score = review['rating']
             review['username'] = user['username']
-            review['score_color'] = get_color_by_score(float(score)).color
+            review['score_color'] = get_color_by_score(float(review['rating'])).color
+            # Добавляем platform, если его нет
+            review['platform'] = review.get('platform', 'Unknown')
+            # Преобразуем дату в строку, если нужно
+            if isinstance(review.get('createdAt'), datetime):
+                review['createdAt'] = review['createdAt'].strftime('%b %d, %Y')
 
     can_review = False
     available_platforms = []
