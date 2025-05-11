@@ -6,7 +6,6 @@ from . import views
 app_name = 'profile'
 
 
-
 urlpatterns = [
     path('', lambda request: redirect('profile:my_rating_and_reviews'), name='profile_root'),
     path('ratings/', views.my_ratings_and_reviews, name='my_rating_and_reviews'),
