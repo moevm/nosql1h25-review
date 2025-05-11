@@ -1,17 +1,15 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponseNotFound, HttpResponseForbidden
+from django.http import HttpResponseNotFound, HttpResponseForbidden, JsonResponse, HttpResponse
 from django.utils import timezone
 from django.conf import settings
 from django.utils.dateparse import parse_date
 from django.contrib import messages
-
+import json
 from bson import datetime as bson_datetime, ObjectId
 from datetime import datetime as py_datetime
-
 from pymongo import MongoClient
 
 from user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
-
 from utils.color_code import get_color_by_score
 
 client = MongoClient(settings.MONGO_DB_URI)
@@ -48,7 +46,7 @@ def my_ratings_and_reviews(request):
     for review in reviews:
         review['color'] = get_color_by_score(float(review['rating'])).color
         review['review_id'] = str(review['_id'])
-    
+
     context = {
         'reviews': reviews,
         'section_template': 'profile/sections/ratings.html',
@@ -153,6 +151,32 @@ def statistics(request):
 
 def admin_panel(request):
     games_collection = db['games']
+
+    if request.method == "POST" and request.FILES.get("json_file"):
+        json_file = request.FILES["json_file"]
+        data = json.load(json_file)
+
+        for collection_name, documents in data.items():
+            collection = db[collection_name]
+            collection.drop()
+            if documents:
+                collection.insert_many(documents)
+
+        redirect('core:homepage')
+
+    if request.method == "POST" and request.POST.get("form_type") == "export":
+
+        export_data = {}
+
+        for collection_name in db.list_collection_names():
+            collection = db[collection_name]
+            export_data[collection_name] = list(collection.find({}, {'_id': False}))
+
+        json_str = json.dumps(export_data, indent=2, default=str)
+        response = HttpResponse(json_str, content_type="application/json")
+        filename = f"rotten_scores_backup_{py_datetime.now().strftime('%d%m%Y')}.json"
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        return response
 
     if request.method == 'POST' and request.POST.get('form_type') == 'addgame':
         if not request.user.is_staff:  # Проверка на админа

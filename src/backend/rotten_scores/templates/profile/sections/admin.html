@@ -14,14 +14,53 @@
   <div class="tab-content active" id="tab-export-import">
     <div style="padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
       <h3 style="margin-top: 0;">Export & Import Data</h3>
-      <p>This section will contain tools for data export and import functionality.</p>
+        <form id="export-form" method="post" style="display: none;">
+          {% csrf_token %}
+            <input type="hidden" name="form_type" value="export">
+        </form>
+
       <div style="margin-top: 20px;">
-        <button style="background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">
-          Export Data
+        <button
+        style="background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer;"
+        onclick="document.getElementById('export-form').submit();">
+        Export Data
         </button>
-        <button style="background-color: #2196F3; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer;">
-          Import Data
+          <form id="import-form" method="post" enctype="multipart/form-data" style="display: none;">
+              {% csrf_token %}
+              <input type="file" id="json-file" name="json_file" accept=".json">
+           </form>
+        <button
+            style="background-color: #2196F3; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer;"
+            onclick="document.getElementById('json-file').click();">
+            Import Data
         </button>
+          <script>
+        const fileInput = document.getElementById('json-file');
+
+        fileInput.addEventListener('change', async function () {
+          if (!fileInput.files.length) return;
+
+          const formData = new FormData();
+          formData.append('json_file', fileInput.files[0]);
+
+          formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+          try {
+            const response = await fetch("{% url 'profile:admin_panel' %}", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (response.ok) {
+              window.location.href = "{% url 'core:homepage' %}";
+            } else {
+              alert("Ошибка при импорте.");
+            }
+          } catch (error) {
+            alert("Произошла ошибка: " + error);
+          }
+        });
+      </script>
       </div>
     </div>
   </div>
