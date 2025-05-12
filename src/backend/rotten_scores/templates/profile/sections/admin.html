@@ -67,25 +67,43 @@
 
   <!-- Added Games List -->
   <div class="tab-content" id="tab-added-games" style="display: none;">
-    <div style="padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
-      <h3 style="margin-top: 0;">Recently Added Games</h3>
-      <p>This section will display the list of recently added games.</p>
-      <div style="margin-top: 20px;">
-        <table style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="background-color: #f2f2f2;">
-              <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">Game Title</th>
-              <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">Date Added</th>
-              <th style="padding: 12px; text-align: left; border-bottom: 1px solid #ddd;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td colspan="3" style="padding: 15px; text-align: center;">No games added yet</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <div style="padding: 1rem;">
+      <h3 style="color: #111; margin-bottom: 1rem;">Recently Added Games</h3>
+        <div style="display: flex; flex-wrap: wrap; gap: 1.5rem;">
+          {% for game in games %}
+            <div style="position: relative; background-color: #111; color: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); width: 48%; display: flex; gap: 1rem; padding: 1rem; min-height: 150px;">
+
+              <!-- Game Image -->
+              <div style="position: relative;">
+                <img src="{{ game.imageUrl }}" alt="Game Image" style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+              </div>
+
+              <!-- Game Info -->
+              <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding-right: 90px;"> <!-- отступ для кнопок -->
+
+                <!-- Title & Rating -->
+                <div>
+                  <h4 style="margin: 0 0 0.3rem 0; font-size: 1.1rem; word-break: break-word; white-space: normal;">{{ game.title }}</h4>
+                  <p style="color: #bbb; font-size: 0.85rem; margin: 0;">
+                    Modified at – {{ game.lastModified|date:"M d, Y" }}
+                  </p>
+                </div>
+
+                <!-- Description -->
+                <p style="color: #ddd; font-size: 0.9rem; margin-top: 0.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  {{ game.description|truncatechars:45 }}
+                </p>
+              </div>
+
+              <!-- Action Buttons -->
+              <div style="position: absolute; top: 1rem; right: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                <button style="width: 80px; background-color: #FF4D4D; color: white; border: none; padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.85rem;">Удалить</button>
+                <button style="width: 80px; background-color: #4CAF50; color: white; border: none; padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.85rem;">Изменить</button>
+              </div>
+
+            </div>
+          {% endfor %}
+        </div>
     </div>
   </div>
 
