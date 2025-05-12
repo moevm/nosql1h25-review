@@ -200,7 +200,7 @@ def admin_panel(request):
         except Exception as e:
             messages.error(request, f"Error saving game: {e}")
 
-    all_games = list(games_collection.find().sort('createdAt', -1))
+    all_games = list(games_collection.find().sort('lastModified', -1))
 
     context = {
         'section_template': 'profile/sections/admin.html',
