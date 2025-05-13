@@ -213,7 +213,6 @@ def admin_panel(request):
                 'userReviews': {'total': 0, 'avgRating': 0.0},
                 'criticReviews': {'total': 0, 'avgRating': 0.0}
             },
-            'createdAt': timezone.now(),
             'lastModified': timezone.now()
         }
 
