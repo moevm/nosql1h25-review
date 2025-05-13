@@ -1,0 +1,258 @@
+<div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px;">
+  <h2 style="margin: 0;">Edit Game</h2>
+</div>
+
+<form method="post" id="EditGameCardForm" style="display: flex; flex-direction: column; gap: 30px; width: 100%; max-width: 1200px; margin: 0 auto; font-family: 'Inter', sans-serif;">
+  {% csrf_token %}
+  <input type="hidden" name="form_type" value="addgame">
+
+  <div style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap;">
+    <!-- Левая колонка: Поле для URL изображения -->
+    <div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 15px; width: 300px;">
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <label style="font-weight: 600; font-size: 14px;">Image URL:</label>
+        <input type="text" name="image_url" id="imageUrlInput" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;" placeholder="https://example.com/image.jpg" value="{{ game.imageUrl }}">
+      </div>
+
+      <!-- Превью изображения -->
+      <div style="width: 176px; height: 264px; background-color: #f0f0f0; border-radius: 8px; overflow: hidden;">
+        <img id="gameImagePreview" src="{{ game.imageUrl }}" alt="Game Image Preview" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+    </div>
+
+    <div style="flex: 1; display: flex; gap: 40px; flex-wrap: wrap;">
+      <!-- Текстовые поля -->
+      <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 15px;">
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label style="font-weight: 600; font-size: 14px;">Name:</label>
+          <input type="text" name="name" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;" value="{{ game.title }}">
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label style="font-weight: 600; font-size: 14px;">Description:</label>
+          <textarea name="description" rows="3" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;">{{ game.description }}</textarea>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label style="font-weight: 600; font-size: 14px;">Released On:</label>
+          <input type="date" name="released_on" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;"
+                value="{% if game.releaseDate %}{{ game.releaseDate|date:'Y-m-d' }}{% endif %}">
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 5px;">
+          <label style="font-weight: 600; font-size: 14px;">Game Author:</label>
+          <input type="text" name="game_author" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;" value="{{ game.developer }}">
+        </div>
+      </div>
+
+      <!-- Чекбоксы -->
+      <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 30px;">
+        <!-- Platforms Checkboxes -->
+        <div>
+          <label style="font-weight: 700; font-size: 16px; display: block; margin-bottom: 10px;">Platforms:</label>
+          <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+              <input type="checkbox" name="platforms" value="PS5" {% if 'PS5' in game.platforms %}checked{% endif %}> PS5
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+              <input type="checkbox" name="platforms" value="Xbox Series X/S" {% if 'Xbox Series X/S' in game.platforms %}checked{% endif %}> Xbox Series X/S
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+              <input type="checkbox" name="platforms" value="Nintendo Switch" {% if 'Nintendo Switch' in game.platforms %}checked{% endif %}> Nintendo Switch
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+              <input type="checkbox" name="platforms" value="PC" {% if 'PC' in game.platforms %}checked{% endif %}> PC
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+              <input type="checkbox" name="platforms" value="Mobile" {% if 'Mobile' in game.platforms %}checked{% endif %}> Mobile
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+              <input type="checkbox" name="platforms" value="PS4" {% if 'PS4' in game.platforms %}checked{% endif %}> PS4
+            </label>
+          </div>
+        </div>
+
+        <!-- Genres Checkboxes -->
+        <div>
+          <label style="font-weight: 700; font-size: 16px; display: block; margin-bottom: 10px;">Genres:</label>
+          <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Action" {% if 'Action' in game.genres %}checked{% endif %}> Action
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Adventure" {% if 'Adventure' in game.genres %}checked{% endif %}> Adventure
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Role-playing (RPG)" {% if 'Role-playing (RPG)' in game.genres %}checked{% endif %}> RPG
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Strategy" {% if 'Strategy' in game.genres %}checked{% endif %}> Strategy
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Simulation" {% if 'Simulation' in game.genres %}checked{% endif %}> Simulation
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Sports" {% if 'Sports' in game.genres %}checked{% endif %}> Sports
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Racing" {% if 'Racing' in game.genres %}checked{% endif %}> Racing
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Fighting" {% if 'Fighting' in game.genres %}checked{% endif %}> Fighting
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Puzzle" {% if 'Puzzle' in game.genres %}checked{% endif %}> Puzzle
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Horror" {% if 'Horror' in game.genres %}checked{% endif %}> Horror
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Survival" {% if 'Survival' in game.genres %}checked{% endif %}> Survival
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Battle Royale" {% if 'Battle Royale' in game.genres %}checked{% endif %}> Battle Royale
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="MMORPG" {% if 'MMORPG' in game.genres %}checked{% endif %}> MMORPG
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="MOBA" {% if 'MOBA' in game.genres %}checked{% endif %}> MOBA
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Platformer" {% if 'Platformer' in game.genres %}checked{% endif %}> Platformer
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Stealth" {% if 'Stealth' in game.genres %}checked{% endif %}> Stealth
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Sandbox" {% if 'Sandbox' in game.genres %}checked{% endif %}> Sandbox
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Open World" {% if 'Open World' in game.genres %}checked{% endif %}> Open World
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="First-person Shooter (FPS)" {% if 'First-person Shooter (FPS)' in game.genres %}checked{% endif %}> FPS
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Third-person Shooter (TPS)" {% if 'Third-person Shooter (TPS)' in game.genres %}checked{% endif %}> TPS
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Tactical Shooter" {% if 'Tactical Shooter' in game.genres %}checked{% endif %}> Tactical Shooter
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Roguelike" {% if 'Roguelike' in game.genres %}checked{% endif %}> Roguelike
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Metroidvania" {% if 'Metroidvania' in game.genres %}checked{% endif %}> Metroidvania
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Visual Novel" {% if 'Visual Novel' in game.genres %}checked{% endif %}> Visual Novel
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Rhythm" {% if 'Rhythm' in game.genres %}checked{% endif %}> Rhythm
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Party" {% if 'Party' in game.genres %}checked{% endif %}> Party
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Educational" {% if 'Educational' in game.genres %}checked{% endif %}> Educational
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Card Game" {% if 'Card Game' in game.genres %}checked{% endif %}> Card Game
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Board Game" {% if 'Board Game' in game.genres %}checked{% endif %}> Board Game
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Trivia" {% if 'Trivia' in game.genres %}checked{% endif %}> Trivia
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Кнопка отправки -->
+  <div style="display: flex; justify-content: center; margin-top: 40px; margin-bottom: 20px; gap: 20px;">
+  <button type="button" onclick="confirmDelete('{{ game.id_str }}')"
+          style="width: 220px; background-color: #FF4D4D; color: white; padding: 14px; border: none;
+                 border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: 0.3s;">
+    Delete Game
+  </button>
+  <button type="submit"
+          style="width: 220px; background-color: #FFBD3F; color: black; padding: 14px; border: none;
+                 border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: 0.3s;">
+    Update Game Card
+  </button>
+</div>
+</form>
+
+<!-- Модальное окно подтверждения удаления -->
+<div id="deleteModal" style="display: none; position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000;">
+    <div style="background: #1a1a1a; color: white; width: 400px; padding: 2rem; margin: 10% auto; border-radius: 10px; position: relative;">
+        <h3>Подтверждение удаления</h3>
+        <p>Вы уверены, что хотите удалить игру? Это действие нельзя отменить.</p>
+        <form id="deleteForm" method="POST" action="">
+            {% csrf_token %}
+            <div style="margin-top: 1rem; display: flex; justify-content: flex-end; gap: 1rem;">
+                <button type="button" onclick="closeModal()" style="padding: 0.5rem 1rem; background-color:rgb(155, 155, 155); color: white; border: none; border-radius: 5px;">Отмена</button>
+                <button type="submit" style="padding: 0.5rem 1rem; background-color: #FF4D4D; color: white; border: none; border-radius: 5px;">Удалить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function confirmDelete(gameId) {
+    const modal = document.getElementById('deleteModal');
+    if (!modal) {
+        console.error('Modal element not found');
+        return;
+    }
+
+    const form = document.getElementById('deleteForm');
+    if (!form) {
+        console.error('Delete form not found');
+        return;
+    }
+
+    if (!gameId) {
+        console.error('Game ID is undefined');
+        return;
+    }
+
+    form.action = `/profile/delete_game/${gameId}/`;
+    modal.style.display = 'block';
+}
+
+  function closeModal() {
+      const modal = document.getElementById('deleteModal');
+      if (modal) {
+          modal.style.display = 'none';
+      }
+  }
+
+
+  document.getElementById('deleteForm')?.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const formData = new FormData(form);
+
+      fetch(form.action, {
+          method: 'POST',
+          headers: {
+              'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+          },
+          body: formData
+      })
+      .then(response => {
+          if (response.redirected) {
+              window.location.href = response.url;
+          }
+      })
+      .catch(error => {
+          console.error('Error:', error);
+      });
+  });
+</script>

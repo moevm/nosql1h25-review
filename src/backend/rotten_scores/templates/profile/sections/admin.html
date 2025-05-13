@@ -79,7 +79,7 @@
               </div>
 
               <!-- Game Info -->
-              <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding-right: 90px;"> <!-- отступ для кнопок -->
+              <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding-right: 90px;">
 
                 <!-- Title & Rating -->
                 <div>
@@ -95,10 +95,14 @@
                 </p>
               </div>
 
-              <!-- Action Buttons -->
-              <div style="position: absolute; top: 1rem; right: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
-                <button style="width: 80px; background-color: #FF4D4D; color: white; border: none; padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.85rem;">Удалить</button>
-                <button style="width: 80px; background-color: #4CAF50; color: white; border: none; padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.85rem;">Изменить</button>
+              <!-- Action Button -->
+              <div style="position: absolute; top: 1rem; right: 1rem;">
+                <a href="{% url 'profile:edit_game' game_id=game.id_str %}"
+                   style="width: 120px; background-color: #FFBD3F; color: black; border: none;
+                          padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.85rem;
+                          text-align: center; text-decoration: none; display: block;">
+                  Изменить/Удалить
+                </a>
               </div>
 
             </div>

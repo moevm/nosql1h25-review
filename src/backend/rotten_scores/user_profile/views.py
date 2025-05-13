@@ -14,8 +14,123 @@ from utils.color_code import get_color_by_score
 
 client = MongoClient(settings.MONGO_DB_URI)
 db = client[settings.MONGO_DB_NAME]
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseNotFound, HttpResponseForbidden, JsonResponse, HttpResponse
+from django.contrib import messages
+from bson import ObjectId
 
 
+def delete_game(request, game_id):
+    if not request.user.is_staff:
+        return HttpResponseForbidden("You don't have permission to delete games")
+
+    try:
+        obj_id = ObjectId(game_id)
+    except:
+        messages.error(request, "Invalid game ID format")
+        return redirect('profile:admin_panel')
+
+    game = db.games.find_one({"_id": obj_id})
+    if not game:
+        messages.error(request, "Game not found")
+        return redirect('profile:admin_panel')
+
+
+    db.user_reviews.delete_many({"gameId": obj_id})
+
+
+    result = db.games.delete_one({"_id": obj_id})
+
+    if result.deleted_count == 1:
+        messages.success(request, "Game and all related reviews successfully deleted!")
+    else:
+        messages.error(request, "Failed to delete game")
+
+    return redirect('profile:admin_panel')
+
+def edit_game(request, game_id):
+    if not request.user.is_staff:
+        return HttpResponseForbidden("You don't have permission to edit games")
+
+    try:
+        game = db.games.find_one({"_id": ObjectId(game_id)})
+    except:
+        return HttpResponseNotFound("Invalid game ID")
+
+    if not game:
+        return HttpResponseNotFound("Game not found")
+
+
+    game['id_str'] = str(game['_id'])
+
+
+    context = {
+        'section_template': 'profile/sections/edit_game.html',
+        'game': game,
+        'platforms_list': ['PS5', 'Xbox Series X/S', 'Nintendo Switch', 'PC', 'Mobile', 'PS4'],
+        'genres_list': [
+            'Action', 'Adventure', 'Role-playing (RPG)', 'Strategy', 'Simulation',
+            'Sports', 'Racing', 'Fighting', 'Puzzle', 'Horror', 'Survival',
+            'Battle Royale', 'MMORPG', 'MOBA', 'Platformer', 'Stealth', 'Sandbox',
+            'Open World', 'First-person Shooter (FPS)', 'Third-person Shooter (TPS)',
+            'Tactical Shooter', 'Roguelike', 'Metroidvania', 'Visual Novel', 'Rhythm',
+            'Party', 'Educational', 'Card Game', 'Board Game', 'Trivia'
+        ],
+        'is_edit': True
+    }
+    if request.method == 'POST':
+        title = request.POST.get('name')
+        description = request.POST.get('description')
+        released_on = request.POST.get('released_on')
+        developer = request.POST.get('game_author')
+        publisher = request.POST.get('game_author')
+        image_url = request.POST.get('image_url')
+        platforms = request.POST.getlist('platforms')
+        genres = request.POST.getlist('genres')
+
+        release_date = None
+        if released_on:
+            parsed_date = parse_date(released_on)
+            if parsed_date:
+                release_date = bson_datetime.datetime.combine(
+                    parsed_date,
+                    py_datetime.min.time()
+                )
+
+        update_data = {
+            'title': title,
+            'description': description,
+            'developer': developer,
+            'publisher': publisher,
+            'platforms': platforms,
+            'genres': genres,
+            'imageUrl': image_url,
+            'releaseDate': release_date,
+            'lastModified': timezone.now()
+        }
+
+        try:
+            db.games.update_one(
+                {"_id": ObjectId(game_id)},
+                {"$set": update_data}
+            )
+            messages.success(request, f"Game {title} successfully updated!")
+            return redirect('profile:admin_panel')
+        except Exception as e:
+            messages.error(request, f"Error updating game: {e}")
+
+
+    release_date = ""
+    if game.get('releaseDate'):
+        release_date = game['releaseDate'].strftime('%Y-%m-%d')
+
+    context = {
+        'section_template': 'profile/sections/edit_game.html',
+        'game': game,
+        'release_date': release_date,
+        'is_edit': True
+    }
+    return render(request, 'profile/base_profile.html', context)
 def my_ratings_and_reviews(request):
     user_id = request.user.id
 
@@ -224,6 +339,9 @@ def admin_panel(request):
             messages.error(request, f"Error saving game: {e}")
 
     all_games = list(games_collection.find().sort('lastModified', -1))
+    # Преобразуем ObjectId в строку и сохраняем в новом поле без подчеркивания
+    for game in all_games:
+        game['id_str'] = str(game['_id'])  # Используем 'id_str' вместо '_id_str'
 
     context = {
         'section_template': 'profile/sections/admin.html',
