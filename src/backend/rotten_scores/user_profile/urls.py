@@ -14,4 +14,6 @@ urlpatterns = [
     path('admin_panel/', views.admin_panel, name='admin_panel'),
     path('load_section/', views.load_section, name='load_section'),
     path('logout/', views.custom_logout, name='logout'),
+    path('delete_game/<str:game_id>/', views.delete_game, name='delete_game'),
+    path('edit_game/<str:game_id>/', views.edit_game, name='edit_game'),
 ]
