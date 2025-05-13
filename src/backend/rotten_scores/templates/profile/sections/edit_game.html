@@ -20,9 +20,9 @@
       </div>
     </div>
 
-    <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 30px;">
+    <div style="flex: 1; display: flex; gap: 40px; flex-wrap: wrap;">
       <!-- Текстовые поля -->
-      <div style="display: flex; flex-direction: column; gap: 15px;">
+      <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 15px;">
         <div style="display: flex; flex-direction: column; gap: 5px;">
           <label style="font-weight: 600; font-size: 14px;">Name:</label>
           <input type="text" name="name" style="padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px;" value="{{ game.title }}">
@@ -45,126 +45,129 @@
         </div>
       </div>
 
-      <!-- Platforms Checkboxes -->
-      <div>
-        <label style="font-weight: 700; font-size: 16px; display: block; margin-bottom: 10px;">Platforms:</label>
-        <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-          <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
-            <input type="checkbox" name="platforms" value="PS5" {% if 'PS5' in game.platforms %}checked{% endif %}> PS5
-          </label>
-          <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
-            <input type="checkbox" name="platforms" value="Xbox Series X/S" {% if 'Xbox Series X/S' in game.platforms %}checked{% endif %}> Xbox Series X/S
-          </label>
-          <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
-            <input type="checkbox" name="platforms" value="Nintendo Switch" {% if 'Nintendo Switch' in game.platforms %}checked{% endif %}> Nintendo Switch
-          </label>
-          <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
-            <input type="checkbox" name="platforms" value="PC" {% if 'PC' in game.platforms %}checked{% endif %}> PC
-          </label>
-          <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
-            <input type="checkbox" name="platforms" value="Mobile" {% if 'Mobile' in game.platforms %}checked{% endif %}> Mobile
-          </label>
-          <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
-            <input type="checkbox" name="platforms" value="PS4" {% if 'PS4' in game.platforms %}checked{% endif %}> PS4
-          </label>
+      <!-- Чекбоксы -->
+      <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 30px;">
+        <!-- Platforms Checkboxes -->
+        <div>
+          <label style="font-weight: 700; font-size: 16px; display: block; margin-bottom: 10px;">Platforms:</label>
+          <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+              <input type="checkbox" name="platforms" value="PS5" {% if 'PS5' in game.platforms %}checked{% endif %}> PS5
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+              <input type="checkbox" name="platforms" value="Xbox Series X/S" {% if 'Xbox Series X/S' in game.platforms %}checked{% endif %}> Xbox Series X/S
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+              <input type="checkbox" name="platforms" value="Nintendo Switch" {% if 'Nintendo Switch' in game.platforms %}checked{% endif %}> Nintendo Switch
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+              <input type="checkbox" name="platforms" value="PC" {% if 'PC' in game.platforms %}checked{% endif %}> PC
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+              <input type="checkbox" name="platforms" value="Mobile" {% if 'Mobile' in game.platforms %}checked{% endif %}> Mobile
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(33.33% - 10px); min-width: 120px;">
+              <input type="checkbox" name="platforms" value="PS4" {% if 'PS4' in game.platforms %}checked{% endif %}> PS4
+            </label>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Genres Checkboxes -->
-    <div style="flex: 1; min-width: 100%;">
-      <label style="font-weight: 700; font-size: 16px; display: block; margin-bottom: 10px;">Genres:</label>
-      <div style="display: flex; flex-wrap: wrap; gap: 15px;">
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Action" {% if 'Action' in game.genres %}checked{% endif %}> Action
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Adventure" {% if 'Adventure' in game.genres %}checked{% endif %}> Adventure
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Role-playing (RPG)" {% if 'Role-playing (RPG)' in game.genres %}checked{% endif %}> RPG
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Strategy" {% if 'Strategy' in game.genres %}checked{% endif %}> Strategy
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Simulation" {% if 'Simulation' in game.genres %}checked{% endif %}> Simulation
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Sports" {% if 'Sports' in game.genres %}checked{% endif %}> Sports
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Racing" {% if 'Racing' in game.genres %}checked{% endif %}> Racing
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Fighting" {% if 'Fighting' in game.genres %}checked{% endif %}> Fighting
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Puzzle" {% if 'Puzzle' in game.genres %}checked{% endif %}> Puzzle
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Horror" {% if 'Horror' in game.genres %}checked{% endif %}> Horror
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Survival" {% if 'Survival' in game.genres %}checked{% endif %}> Survival
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Battle Royale" {% if 'Battle Royale' in game.genres %}checked{% endif %}> Battle Royale
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="MMORPG" {% if 'MMORPG' in game.genres %}checked{% endif %}> MMORPG
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="MOBA" {% if 'MOBA' in game.genres %}checked{% endif %}> MOBA
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Platformer" {% if 'Platformer' in game.genres %}checked{% endif %}> Platformer
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Stealth" {% if 'Stealth' in game.genres %}checked{% endif %}> Stealth
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Sandbox" {% if 'Sandbox' in game.genres %}checked{% endif %}> Sandbox
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Open World" {% if 'Open World' in game.genres %}checked{% endif %}> Open World
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="First-person Shooter (FPS)" {% if 'First-person Shooter (FPS)' in game.genres %}checked{% endif %}> FPS
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Third-person Shooter (TPS)" {% if 'Third-person Shooter (TPS)' in game.genres %}checked{% endif %}> TPS
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Tactical Shooter" {% if 'Tactical Shooter' in game.genres %}checked{% endif %}> Tactical Shooter
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Roguelike" {% if 'Roguelike' in game.genres %}checked{% endif %}> Roguelike
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Metroidvania" {% if 'Metroidvania' in game.genres %}checked{% endif %}> Metroidvania
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Visual Novel" {% if 'Visual Novel' in game.genres %}checked{% endif %}> Visual Novel
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Rhythm" {% if 'Rhythm' in game.genres %}checked{% endif %}> Rhythm
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Party" {% if 'Party' in game.genres %}checked{% endif %}> Party
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Educational" {% if 'Educational' in game.genres %}checked{% endif %}> Educational
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Card Game" {% if 'Card Game' in game.genres %}checked{% endif %}> Card Game
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Board Game" {% if 'Board Game' in game.genres %}checked{% endif %}> Board Game
-        </label>
-        <label style="display: flex; align-items: center; gap: 5px; width: calc(20% - 12px); min-width: 150px;">
-          <input type="checkbox" name="genres" value="Trivia" {% if 'Trivia' in game.genres %}checked{% endif %}> Trivia
-        </label>
+        <!-- Genres Checkboxes -->
+        <div>
+          <label style="font-weight: 700; font-size: 16px; display: block; margin-bottom: 10px;">Genres:</label>
+          <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Action" {% if 'Action' in game.genres %}checked{% endif %}> Action
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Adventure" {% if 'Adventure' in game.genres %}checked{% endif %}> Adventure
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Role-playing (RPG)" {% if 'Role-playing (RPG)' in game.genres %}checked{% endif %}> RPG
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Strategy" {% if 'Strategy' in game.genres %}checked{% endif %}> Strategy
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Simulation" {% if 'Simulation' in game.genres %}checked{% endif %}> Simulation
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Sports" {% if 'Sports' in game.genres %}checked{% endif %}> Sports
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Racing" {% if 'Racing' in game.genres %}checked{% endif %}> Racing
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Fighting" {% if 'Fighting' in game.genres %}checked{% endif %}> Fighting
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Puzzle" {% if 'Puzzle' in game.genres %}checked{% endif %}> Puzzle
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Horror" {% if 'Horror' in game.genres %}checked{% endif %}> Horror
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Survival" {% if 'Survival' in game.genres %}checked{% endif %}> Survival
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Battle Royale" {% if 'Battle Royale' in game.genres %}checked{% endif %}> Battle Royale
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="MMORPG" {% if 'MMORPG' in game.genres %}checked{% endif %}> MMORPG
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="MOBA" {% if 'MOBA' in game.genres %}checked{% endif %}> MOBA
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Platformer" {% if 'Platformer' in game.genres %}checked{% endif %}> Platformer
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Stealth" {% if 'Stealth' in game.genres %}checked{% endif %}> Stealth
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Sandbox" {% if 'Sandbox' in game.genres %}checked{% endif %}> Sandbox
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Open World" {% if 'Open World' in game.genres %}checked{% endif %}> Open World
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="First-person Shooter (FPS)" {% if 'First-person Shooter (FPS)' in game.genres %}checked{% endif %}> FPS
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Third-person Shooter (TPS)" {% if 'Third-person Shooter (TPS)' in game.genres %}checked{% endif %}> TPS
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Tactical Shooter" {% if 'Tactical Shooter' in game.genres %}checked{% endif %}> Tactical Shooter
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Roguelike" {% if 'Roguelike' in game.genres %}checked{% endif %}> Roguelike
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Metroidvania" {% if 'Metroidvania' in game.genres %}checked{% endif %}> Metroidvania
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Visual Novel" {% if 'Visual Novel' in game.genres %}checked{% endif %}> Visual Novel
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Rhythm" {% if 'Rhythm' in game.genres %}checked{% endif %}> Rhythm
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Party" {% if 'Party' in game.genres %}checked{% endif %}> Party
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Educational" {% if 'Educational' in game.genres %}checked{% endif %}> Educational
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Card Game" {% if 'Card Game' in game.genres %}checked{% endif %}> Card Game
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Board Game" {% if 'Board Game' in game.genres %}checked{% endif %}> Board Game
+            </label>
+            <label style="display: flex; align-items: center; gap: 5px; width: calc(25% - 12px); min-width: 150px;">
+              <input type="checkbox" name="genres" value="Trivia" {% if 'Trivia' in game.genres %}checked{% endif %}> Trivia
+            </label>
+          </div>
+        </div>
       </div>
     </div>
   </div>
