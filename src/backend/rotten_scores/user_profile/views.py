@@ -25,13 +25,28 @@ def delete_game(request, game_id):
         return HttpResponseForbidden("You don't have permission to delete games")
 
     try:
-        db.games.delete_one({"_id": ObjectId(game_id)})
-        messages.success(request, "Game successfully deleted!")
-    except Exception as e:
-        messages.error(request, f"Error deleting game: {e}")
+        obj_id = ObjectId(game_id)
+    except:
+        messages.error(request, "Invalid game ID format")
+        return redirect('profile:admin_panel')
+
+    game = db.games.find_one({"_id": obj_id})
+    if not game:
+        messages.error(request, "Game not found")
+        return redirect('profile:admin_panel')
+
+
+    db.user_reviews.delete_many({"gameId": obj_id})
+
+
+    result = db.games.delete_one({"_id": obj_id})
+
+    if result.deleted_count == 1:
+        messages.success(request, "Game and all related reviews successfully deleted!")
+    else:
+        messages.error(request, "Failed to delete game")
 
     return redirect('profile:admin_panel')
-
 
 def edit_game(request, game_id):
     if not request.user.is_staff:
