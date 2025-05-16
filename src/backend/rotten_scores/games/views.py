@@ -1,32 +1,127 @@
-from utils.color_code import get_color_by_score
+from src.backend.rotten_scores.utils.color_code import get_color_by_score
+from src.schemas import Game
 
-from django.http import HttpResponse
-from django.http import JsonResponse
-from .models import Game
 import logging
-from pymongo import MongoClient
-from django.conf import settings
 from datetime import datetime
-from django.views.generic import TemplateView
-import sys
-import os
-from django.shortcuts import render, get_object_or_404
+from typing import Any
+
+from django.http import HttpResponse, JsonResponse, HttpRequest
+from django.core.paginator import Paginator, Page, EmptyPage, PageNotAnInteger
+from django.views import View
+from django.conf import settings
+from django.shortcuts import render
+
+from pymongo import MongoClient, ASCENDING, DESCENDING
+from pymongo.collection import Collection
+
 from bson.objectid import ObjectId
+
+logger = logging.getLogger(__name__)
 
 client = MongoClient(settings.MONGO_DB_URI)
 db = client[settings.MONGO_DB_NAME]
 
 
-def game_list(request):
-    return HttpResponse("Заглушка лист игр")
+class GamesListView(View):
+    template_name: str = "games/game_list.html"
+    games_per_page: int = 18
 
+    def get(self, request: HttpRequest) -> HttpResponse:
+        filters = self._parse_filters(request)
+        query = self._build_query(filters)
+        sort_field, sort_order = self._get_sorting(filters)
 
-#     query = request.GET.get('q', '')
-#     if query:
-#         games = Game.objects.filter(title__icontains=query)
-#     else:
-#         games = Game.objects.all()
-#     return render(request, 'game_list.html', {'games': games, 'query': query})
+        collection: Collection[Game] = db["games"]
+        games = list(collection.find(query).sort(sort_field, sort_order))
+
+        page_obj = self._get_page(request, games)
+
+        all_platforms = self._sort_platforms_by_appearance()
+        all_genres = sorted(collection.distinct("genres"))
+
+        context = self._build_context(total_games=len(games),
+                                      filters=filters,
+                                      all_platforms=all_platforms,
+                                      all_genres=all_genres,
+                                      page_obj=page_obj,
+                                      is_paginated=page_obj.has_other_pages())
+        return render(request, self.template_name, context)
+
+    @staticmethod
+    def _parse_filters(request: HttpRequest) -> dict[str, Any]:
+        return {
+            "platforms": request.GET.getlist("platform"),
+            "genres": request.GET.getlist("genre"),
+            "sort_by": request.GET.get("sort", "releaseDate"),
+            "order": request.GET.get("order", "desc"),
+        }
+
+    @staticmethod
+    def _build_query(filters: dict[str, Any]) -> dict[str, Any]:
+        query: dict[str, Any] = {}
+        if filters["platforms"]:
+            query["platforms"] = {"$in": filters["platforms"]}
+        if filters["genres"]:
+            query["genres"] = {"$in": filters["genres"]}
+        return query
+
+    @staticmethod
+    def _get_sorting(filters: dict[str, Any]) -> tuple[str, int]:
+        sort_map: dict[str, str] = {
+            "releaseDate": "releaseDate",
+            "user_score": "stats.userReviews.avgRating",
+            "critic_score": "stats.criticReviews.avgRating",
+        }
+        sort_field: str = sort_map.get(filters["sort_by"], "releaseDate")
+        sort_order: int = DESCENDING if filters["order"] == "desc" else ASCENDING
+
+        return sort_field, sort_order
+
+    @staticmethod
+    def _get_page(request: HttpRequest, games: list[Game]) -> Page:
+        page_number = request.GET.get("page", "1")
+        per_page = int(request.GET.get("per_page", GamesListView.games_per_page))
+
+        paginator = Paginator(games, per_page)
+        try:
+            page_obj = paginator.page(page_number)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+        return page_obj
+
+    @staticmethod
+    def _sort_platforms_by_appearance() -> list[str]:
+        platform_counts = db["games"].aggregate([
+            {"$unwind": "$platforms"},
+            {"$group": {"_id": "$platforms", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}}
+        ])
+        return [p["_id"] for p in platform_counts]
+
+    @staticmethod
+    def _build_context(
+            total_games: int,
+            filters: dict[str, Any],
+            all_platforms: list[str],
+            all_genres: list[str],
+            page_obj: Page,
+            is_paginated: bool,
+    ) -> dict[str, Any]:
+        return {
+            "games": page_obj.object_list,
+            "total_games": total_games,
+            "platforms": all_platforms,
+            "genres": all_genres,
+            "selected_platforms": filters["platforms"],
+            "selected_genres": filters["genres"],
+            "sort_by": filters["sort_by"],
+            "order": filters["order"],
+            "page_obj": page_obj,
+            "is_paginated": is_paginated,
+        }
+
 
 def game_detail(request, pk):
     try:
@@ -97,9 +192,6 @@ def game_detail(request, pk):
     }
 
     return render(request, 'games/game_detail.html', context)
-
-
-logger = logging.getLogger(__name__)
 
 
 def search_games(request):
