@@ -3,6 +3,7 @@ from typing import NamedTuple
 GREEN = "#28a745"
 YELLOW = "#ffc107"
 RED = "#dc3545"
+NO_SCORE = "#6c757d"
 
 
 class ColorCode(NamedTuple):
@@ -19,11 +20,13 @@ def get_color_by_score(score: int | float) -> ColorCode:
     :param score: The score to evaluate.
     :return: A string representing the color code.
     """
+    if score is None or score == '':
+        return ColorCode(NO_SCORE, "No score available")
     if isinstance(score, float):
         return _get_color_by_user_score(score)
     elif isinstance(score, int):
         return _get_color_by_critic_score(score)
-    raise ValueError("Score must be an integer for critic score or a float for user score.")
+    raise ValueError(f"Score must be an integer for critic score or a float for user score. Got {type(score)}.")
 
 
 def _get_color_by_user_score(score: float) -> ColorCode:
