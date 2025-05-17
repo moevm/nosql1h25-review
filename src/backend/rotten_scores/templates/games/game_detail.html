@@ -96,7 +96,7 @@
                     <div class="border p-3 rounded h-100">
                       <div class="d-flex align-items-center mb-2">
                             <span style="background-color: {{ review.score_color }}; color: black; font-weight: bold; padding: 0.3rem 0.8rem; border-radius: 6px; margin-right: 10px;">
-                                {{ review.rating }}/100
+                                {{ review.rating }}
                             </span>
                             <strong>{{ review.publication }}</strong>
                       </div>
@@ -424,7 +424,7 @@
 
 
             document.getElementById('modalPublication').textContent = publication;
-            document.getElementById('modalCriticRating').textContent = rating + '/100';
+            document.getElementById('modalCriticRating').textContent = rating;
             document.getElementById('modalCriticRating').style.backgroundColor = color;
             document.getElementById('modalCriticText').textContent = text;
             document.getElementById('modalCriticCreatedAt').textContent = createdAt;
