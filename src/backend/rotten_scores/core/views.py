@@ -30,6 +30,11 @@ class HomepageView(TemplateView):
 
         # Получение новых релизов
         new_releases_pipeline = [
+            {
+        "$match": {
+            "releaseDate": {"$lte": datetime.utcnow()}
+        }
+        },
             {"$project": {
                 "_id": 1,
                 "title": 1,
