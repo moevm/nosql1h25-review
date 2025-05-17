@@ -96,12 +96,24 @@
                     <div class="border p-3 rounded h-100">
                       <div class="d-flex align-items-center mb-2">
                             <span style="background-color: {{ review.score_color }}; color: black; font-weight: bold; padding: 0.3rem 0.8rem; border-radius: 6px; margin-right: 10px;">
-                                {{ review.rating }}
+                                {{ review.rating }}/100
                             </span>
                             <strong>{{ review.publication }}</strong>
                       </div>
                       <p class="mb-2">{{ review.text|truncatechars:100 }}</p>
-                      <a href="{{ review.fullReviewLink }}" target="_blank" class="small text-decoration-underline">FULL REVIEW</a>
+                      <div class="d-flex justify-content-between">
+                        <a href="{{ review.fullReviewLink }}" target="_blank" class="small text-decoration-underline">FULL REVIEW</a>
+                        <button type="button" class="btn btn-dark btn-sm read-more-critic-btn"
+                                data-bs-toggle="modal" data-bs-target="#criticReviewModal"
+                                data-publication="{{ review.publication }}"
+                                data-rating="{{ review.rating }}"
+                                data-text="{{ review.text }}"
+                                data-createdat="{{ review.createdAt }}"
+                                data-platforms="{{ review.platforms|join:', ' }}"
+                                data-color="{{ review.score_color }}">
+                            Read more
+                        </button>
+                      </div>
                       <div class="d-flex justify-content-between align-items-center mt-2 small">
                         <span class="text-muted">{{ review.createdAt }}</span>
                         <span class="fw-bold">{{ review.platforms.0 }}</span>
@@ -109,13 +121,16 @@
                     </div>
                   </div>
                   {% endfor %}
+              </div>
             {% elif is_released %}
                 <div class="col-12">
                     <div class="text-center text-muted mt-5 mb-5">
                       <i>There are no critic reviews yet :(</i>
                     </div>
+                </div>
             {% endif %}
-                    {% if user_reviews.0 %}
+
+            {% if user_reviews.0 %}
           <div class="row mt-5">
               <div class="col-12">
                 <h4 class="fw-bold">USER REVIEWS</h4>
@@ -152,13 +167,15 @@
                 <div class="text-center text-muted mt-5 mb-5">
                   <i>There are no user reviews yet :(</i>
                 </div>
+            </div>
         {% endif %}
             </div>
         </div>
     </div>
   </div>
 </div>
-<!-- Review Modal -->
+
+<!-- User Review Modal -->
 <div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -168,7 +185,7 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-12">  
+                    <div class="col-md-12">
                         <div class="d-flex align-items-center mb-4">
                             <span id="modalRating" style="
                                 background-color: #aaaaaa;
@@ -195,6 +212,45 @@
         </div>
     </div>
 </div>
+
+<!-- Critic Review Modal -->
+<div class="modal fade" id="criticReviewModal" tabindex="-1" aria-labelledby="criticReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="criticReviewModalLabel">Critic Review</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="d-flex align-items-center mb-4">
+                            <span id="modalCriticRating" style="
+                                background-color: #aaaaaa;
+                                color: black;
+                                font-weight: bold;
+                                padding: 0.5rem 1rem;
+                                border-radius: 6px;
+                                margin-right: 10px;
+                                font-size: 1.2rem;
+                            ">0/100</span>
+                            <h5 id="modalPublication" class="mb-0"></h5>
+                        </div>
+                        <p id="modalCriticText" class="mb-3"></p>
+                        <div class="d-flex justify-content-between align-items-center small">
+                            <span id="modalCriticCreatedAt" class="text-muted me-auto"></span>
+                            <span id="modalPlatforms" class="fw-bold ms-2"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Модалка -->
 <div class="modal fade" id="addReviewModal" tabindex="-1" aria-labelledby="addReviewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -334,8 +390,9 @@
 
     reviewModal.addEventListener('hidden.bs.modal', resetForm);
   });
-document.addEventListener('DOMContentLoaded', function() {
-    // Обработка кнопок Read more
+
+  document.addEventListener('DOMContentLoaded', function() {
+   
     document.querySelectorAll('.read-more-btn').forEach(button => {
         button.addEventListener('click', function() {
             const username = this.getAttribute('data-username');
@@ -354,6 +411,26 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('modalPlatform').textContent = platform;
         });
     });
-});
+
+
+    document.querySelectorAll('.read-more-critic-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const publication = this.getAttribute('data-publication');
+            const rating = this.getAttribute('data-rating');
+            const text = this.getAttribute('data-text');
+            const createdAt = this.getAttribute('data-createdat');
+            const platforms = this.getAttribute('data-platforms');
+            const color = this.getAttribute('data-color');
+
+
+            document.getElementById('modalPublication').textContent = publication;
+            document.getElementById('modalCriticRating').textContent = rating + '/100';
+            document.getElementById('modalCriticRating').style.backgroundColor = color;
+            document.getElementById('modalCriticText').textContent = text;
+            document.getElementById('modalCriticCreatedAt').textContent = createdAt;
+            document.getElementById('modalPlatforms').textContent = platforms;
+        });
+    });
+  });
   </script>
 {% endblock %}
