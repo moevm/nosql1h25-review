@@ -1,21 +1,17 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponseNotFound, HttpResponseForbidden, JsonResponse, HttpResponse
+import json
+from datetime import datetime as py_datetime
+
 from django.utils import timezone
 from django.conf import settings
 from django.utils.dateparse import parse_date
 from django.contrib import messages
-import json
+from django.shortcuts import render, redirect
+from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponse
+
 from bson import datetime as bson_datetime, ObjectId
-from datetime import datetime as py_datetime
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseNotFound, HttpResponseForbidden, JsonResponse, HttpResponse
-from django.contrib import messages
-from bson import ObjectId
+
 from pymongo import MongoClient
 
-from src.backend.user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
-
-from src.utils.color_code import get_color_by_score
 from src.backend.user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
 from src.utils.color_code import get_color_by_score
 
