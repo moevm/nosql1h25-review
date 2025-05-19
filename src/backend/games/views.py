@@ -1,4 +1,4 @@
-from src.backend.rotten_scores.utils.color_code import get_color_by_score
+from src.utils.color_code import get_color_by_score
 from src.schemas import Game
 
 import logging
@@ -39,12 +39,14 @@ class GamesListView(View):
         all_platforms = self._sort_platforms_by_appearance()
         all_genres = sorted(collection.distinct("genres"))
 
-        context = self._build_context(total_games=len(games),
-                                      filters=filters,
-                                      all_platforms=all_platforms,
-                                      all_genres=all_genres,
-                                      page_obj=page_obj,
-                                      is_paginated=page_obj.has_other_pages())
+        context = self._build_context(
+            total_games=len(games),
+            filters=filters,
+            all_platforms=all_platforms,
+            all_genres=all_genres,
+            page_obj=page_obj,
+            is_paginated=page_obj.has_other_pages(),
+        )
         return render(request, self.template_name, context)
 
     @staticmethod
@@ -93,21 +95,23 @@ class GamesListView(View):
 
     @staticmethod
     def _sort_platforms_by_appearance() -> list[str]:
-        platform_counts = db["games"].aggregate([
-            {"$unwind": "$platforms"},
-            {"$group": {"_id": "$platforms", "count": {"$sum": 1}}},
-            {"$sort": {"count": -1}}
-        ])
+        platform_counts = db["games"].aggregate(
+            [
+                {"$unwind": "$platforms"},
+                {"$group": {"_id": "$platforms", "count": {"$sum": 1}}},
+                {"$sort": {"count": -1}},
+            ]
+        )
         return [p["_id"] for p in platform_counts]
 
     @staticmethod
     def _build_context(
-            total_games: int,
-            filters: dict[str, Any],
-            all_platforms: list[str],
-            all_genres: list[str],
-            page_obj: Page,
-            is_paginated: bool,
+        total_games: int,
+        filters: dict[str, Any],
+        all_platforms: list[str],
+        all_genres: list[str],
+        page_obj: Page,
+        is_paginated: bool,
     ) -> dict[str, Any]:
         return {
             "games": page_obj.object_list,
@@ -125,117 +129,141 @@ class GamesListView(View):
 
 def game_detail(request, pk):
     try:
-        game = db.games.find_one({'_id': ObjectId(pk)})
+        game = db.games.find_one({"_id": ObjectId(pk)})
     except Exception:
         game = None
 
     if not game:
-        return render(request, '404.html', status=404)
+        return render(request, "404.html", status=404)
 
     critic_reviews = []
     user_reviews = []
 
-    game['id'] = str(game['_id'])
+    game["id"] = str(game["_id"])
 
-    if 'recentCriticReviews' in game:
-        critic_reviews = game['recentCriticReviews']
+    if "recentCriticReviews" in game:
+        critic_reviews = game["recentCriticReviews"]
         for review in critic_reviews:
-            score = review['rating']
-            review['score_color'] = get_color_by_score(int(score)).color
+            score = review["rating"]
+            review["score_color"] = get_color_by_score(int(score)).color
 
-    if 'recentUserReviews' in game:
-        user_reviews = game['recentUserReviews']
+    if "recentUserReviews" in game:
+        user_reviews = game["recentUserReviews"]
         for review in user_reviews:
             user = db.users.find_one({"_id": review["userId"]})
-            review['username'] = user['username']
-            review['score_color'] = get_color_by_score(float(review['rating'])).color
+            review["username"] = user["username"]
+            review["score_color"] = get_color_by_score(float(review["rating"])).color
             # Добавляем platform, если его нет
-            review['platform'] = review.get('platform', 'Unknown')
+            review["platform"] = review.get("platform", "Unknown")
             # Преобразуем дату в строку, если нужно
-            if isinstance(review.get('createdAt'), datetime):
-                review['createdAt'] = review['createdAt'].strftime('%b %d, %Y')
+            if isinstance(review.get("createdAt"), datetime):
+                review["createdAt"] = review["createdAt"].strftime("%b %d, %Y")
 
     can_review = False
     available_platforms = []
 
     is_released = True
-    if 'releaseDate' in game and isinstance(game['releaseDate'], datetime):
-        game['release_date_formatted'] = game['releaseDate'].strftime('%b %d, %Y')
-        is_released = game['releaseDate'] <= datetime.now()
+    if "releaseDate" in game and isinstance(game["releaseDate"], datetime):
+        game["release_date_formatted"] = game["releaseDate"].strftime("%b %d, %Y")
+        is_released = game["releaseDate"] <= datetime.now()
 
     if request.user.is_authenticated:
-        cursor = db.user_reviews.find({'gameId': ObjectId(pk), 'userId': ObjectId(request.user.id)})
+        cursor = db.user_reviews.find(
+            {"gameId": ObjectId(pk), "userId": ObjectId(request.user.id)}
+        )
         user_reviews_by_current_user = list(cursor)
-        reviewed_platforms = {review['platform'] for review in user_reviews_by_current_user}
-        available_platforms = [p for p in game.get('platforms', []) if p not in reviewed_platforms]
+        reviewed_platforms = {
+            review["platform"] for review in user_reviews_by_current_user
+        }
+        available_platforms = [
+            p for p in game.get("platforms", []) if p not in reviewed_platforms
+        ]
     else:
-        available_platforms = game.get('platforms', [])
+        available_platforms = game.get("platforms", [])
 
     average_score = 0
     average_score_color = None
     average_score_message = None
-    if 'stats' in game and 'criticReviews' in game['stats']:
-        average_score = game['stats']['criticReviews']['avgRating']
+    if "stats" in game and "criticReviews" in game["stats"]:
+        average_score = game["stats"]["criticReviews"]["avgRating"]
         average_score_color = get_color_by_score(int(average_score)).color
         average_score_message = get_color_by_score(int(average_score)).message
 
     context = {
-        'game': game,
-        'critic_reviews': critic_reviews,
-        'user_reviews': user_reviews,
-        'range_1_10': range(1, 11),
-        'is_released': is_released,
-        'available_platforms': available_platforms,
-        'average_score': average_score,
-        'average_score_color': average_score_color,
-        'average_score_message': average_score_message
+        "game": game,
+        "critic_reviews": critic_reviews,
+        "user_reviews": user_reviews,
+        "range_1_10": range(1, 11),
+        "is_released": is_released,
+        "available_platforms": available_platforms,
+        "average_score": average_score,
+        "average_score_color": average_score_color,
+        "average_score_message": average_score_message,
     }
 
-    return render(request, 'games/game_detail.html', context)
+    return render(request, "games/game_detail.html", context)
 
 
 def search_games(request):
     try:
-        query = request.GET.get('q', '').strip().lower()
+        query = request.GET.get("q", "").strip().lower()
 
-        if not query or 'games' not in db.list_collection_names():
+        if not query or "games" not in db.list_collection_names():
             return JsonResponse([], safe=False)
 
         query_words = query.split()
         first_word = query_words[0]
 
         # 1. Точное совпадение начала названия (с учетом регистра)
-        exact_start = list(db.games.find(
-            {"title": {"$regex": f"^{query}", "$options": "i"}},
-            {"title": 1, "imageUrl": 1, "releaseDate": 1, "stats": 1, "genres": 1}
-        ).limit(5))
+        exact_start = list(
+            db.games.find(
+                {"title": {"$regex": f"^{query}", "$options": "i"}},
+                {"title": 1, "imageUrl": 1, "releaseDate": 1, "stats": 1, "genres": 1},
+            ).limit(5)
+        )
 
         # 2. Начинается с первого слова запроса
-        starts_with_first_word = list(db.games.find(
-            {"title": {"$regex": f"^{first_word}", "$options": "i"}},
-            {"title": 1, "imageUrl": 1, "releaseDate": 1, "stats": 1, "genres": 1}
-        ).limit(5))
+        starts_with_first_word = list(
+            db.games.find(
+                {"title": {"$regex": f"^{first_word}", "$options": "i"}},
+                {"title": 1, "imageUrl": 1, "releaseDate": 1, "stats": 1, "genres": 1},
+            ).limit(5)
+        )
 
         # 3. Все слова запроса присутствуют в любом порядке
-        all_words_query = {"$and": [{"title": {"$regex": f"{word}", "$options": "i"}} for word in query_words]}
-        contains_all_words = list(db.games.find(
-            all_words_query,
-            {"title": 1, "imageUrl": 1, "releaseDate": 1, "stats": 1, "genres": 1}
-        ).limit(5))
+        all_words_query = {
+            "$and": [
+                {"title": {"$regex": f"{word}", "$options": "i"}}
+                for word in query_words
+            ]
+        }
+        contains_all_words = list(
+            db.games.find(
+                all_words_query,
+                {"title": 1, "imageUrl": 1, "releaseDate": 1, "stats": 1, "genres": 1},
+            ).limit(5)
+        )
 
         # 4. Любое частичное совпадение
-        partial_match = list(db.games.find(
-            {"title": {"$regex": query, "$options": "i"}},
-            {"title": 1, "imageUrl": 1, "releaseDate": 1, "stats": 1, "genres": 1}
-        ).limit(5))
+        partial_match = list(
+            db.games.find(
+                {"title": {"$regex": query, "$options": "i"}},
+                {"title": 1, "imageUrl": 1, "releaseDate": 1, "stats": 1, "genres": 1},
+            ).limit(5)
+        )
 
         # Объединяем результаты, устраняя дубликаты
         seen_ids = set()
         results = []
 
-        for group in [exact_start, starts_with_first_word, contains_all_words, partial_match]:
+        for group in [
+            exact_start,
+            starts_with_first_word,
+            contains_all_words,
+            partial_match,
+        ]:
             for game in group:
-                game_id = str(game['_id'])
+                game_id = str(game["_id"])
                 if game_id not in seen_ids and len(results) < 5:
                     seen_ids.add(game_id)
                     results.append(game)
@@ -247,24 +275,36 @@ def search_games(request):
         # Форматируем результаты
         games = []
         month_names = [
-            'January', 'February', 'March', 'April', 'May', 'June',
-            'July', 'August', 'September', 'October', 'November', 'December'
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
         ]
 
         for game in results:
             # Форматирование даты
-            release_date = game.get('releaseDate')
-            formatted_date = 'N/A'
+            release_date = game.get("releaseDate")
+            formatted_date = "N/A"
 
             if release_date:
                 try:
                     if isinstance(release_date, str):
                         # Пробуем разные форматы даты
                         try:
-                            release_date = datetime.strptime(release_date, '%Y-%m-%d')
+                            release_date = datetime.strptime(release_date, "%Y-%m-%d")
                         except ValueError:
                             try:
-                                release_date = datetime.strptime(release_date, '%m/%d/%Y')
+                                release_date = datetime.strptime(
+                                    release_date, "%m/%d/%Y"
+                                )
                             except ValueError:
                                 release_date = None
 
@@ -277,18 +317,24 @@ def search_games(request):
 
                 except Exception as e:
                     logger.error(f"Error formatting date: {str(e)}")
-                    formatted_date = 'N/A'
+                    formatted_date = "N/A"
 
-            critic_rating = game.get('stats', {}).get('criticReviews', {}).get('avgRating', 'N/A')
-            color = get_color_by_score(critic_rating).color if critic_rating != 'N/A' else None
+            critic_rating = (
+                game.get("stats", {}).get("criticReviews", {}).get("avgRating", "N/A")
+            )
+            color = (
+                get_color_by_score(critic_rating).color
+                if critic_rating != "N/A"
+                else None
+            )
             game_data = {
-                'id': str(game['_id']),
-                'title': game.get('title', ''),
-                'imageUrl': game.get('imageUrl', ''),
-                'releaseDate': formatted_date,
-                'criticRating': critic_rating,
-                'genres': ', '.join(game.get('genres', [])),
-                'color': color
+                "id": str(game["_id"]),
+                "title": game.get("title", ""),
+                "imageUrl": game.get("imageUrl", ""),
+                "releaseDate": formatted_date,
+                "criticRating": critic_rating,
+                "genres": ", ".join(game.get("genres", [])),
+                "color": color,
             }
             games.append(game_data)
 
@@ -304,7 +350,7 @@ def search_games(request):
             else:
                 return 3
 
-        games.sort(key=lambda x: (relevance_score(x['title']), x['title']))
+        games.sort(key=lambda x: (relevance_score(x["title"]), x["title"]))
 
         return JsonResponse(games[:5], safe=False)
 

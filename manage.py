@@ -3,10 +3,13 @@
 import os
 import sys
 
+from pathlib import Path
+
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'rotten_scores.settings')
+    sys.path.append(str(Path(__file__).resolve().parent / 'src'))
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.rotten_scores.settings')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

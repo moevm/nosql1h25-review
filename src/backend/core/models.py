@@ -63,7 +63,6 @@ class User(AbstractBaseUser):
             return super().save(*args, **kwargs)
         except DatabaseError as e:
             if "did not affect any rows" in str(e):
-                # Игнорируем ошибку, так как Djongo может не возвращать affected rows
                 pass
             else:
                 raise

@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from datetime import datetime
 from django.contrib.auth.hashers import make_password
-from core.models import User
+from src.backend.core.models import User
 
 
 class ChangePersonalDataForm(forms.Form):

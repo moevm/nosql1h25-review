@@ -1,4 +1,4 @@
-from src.backend.rotten_scores.utils.color_code import get_color_by_score
+from src.utils.color_code import get_color_by_score
 
 from django import template
 

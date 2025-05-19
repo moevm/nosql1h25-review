@@ -1,5 +1,5 @@
 from django.db import models
-from core.models import User
+from src.backend.core.models import User
 
 class GameReview(models.Model):
     user = models.ForeignKey(

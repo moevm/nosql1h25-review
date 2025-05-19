@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Quick-start development settings - unsuitable for production
@@ -36,11 +36,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'reviews.apps.ReviewsConfig',
-    'user_profile.apps.UserProfileConfig',
-    'games.apps.GamesConfig',
-    'core.apps.CoreConfig',
-    'admin_panel.apps.AdminPanelConfig',
+    'backend.reviews.apps.ReviewsConfig',
+    'backend.user_profile.apps.UserProfileConfig',
+    'backend.games.apps.GamesConfig',
+    'backend.core.apps.CoreConfig',
+    'backend.admin_panel.apps.AdminPanelConfig',
 ]
 
 MIDDLEWARE = [
@@ -54,16 +54,16 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'core.backends.MongoEngineBackend'
+    'backend.core.backends.MongoEngineBackend'
 ]
 
 
-ROOT_URLCONF = 'rotten_scores.urls'
+ROOT_URLCONF = 'backend.rotten_scores.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR / 'backend' / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -78,9 +78,9 @@ TEMPLATES = [
 
 
 STATICFILES_DIRS = [
-    BASE_DIR / "static_dev",
+    BASE_DIR / 'backend' / "static_dev",
 ]
-WSGI_APPLICATION = 'rotten_scores.wsgi.application'
+WSGI_APPLICATION = 'backend.rotten_scores.wsgi.application'
 
 LOGIN_REDIRECT_URL = '/'
 

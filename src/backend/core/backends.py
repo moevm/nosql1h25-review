@@ -1,7 +1,10 @@
-from django.contrib.auth.backends import BaseBackend
-from . import models
 import logging
+
+from django.contrib.auth.backends import BaseBackend
 from django.core.exceptions import ObjectDoesNotExist
+
+from src.backend.core import models
+
 from bson import ObjectId
 
 logger = logging.getLogger(__name__)

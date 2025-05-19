@@ -7,17 +7,21 @@ from django.contrib import messages
 import json
 from bson import datetime as bson_datetime, ObjectId
 from datetime import datetime as py_datetime
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseNotFound, HttpResponseForbidden, JsonResponse, HttpResponse
+from django.contrib import messages
+from bson import ObjectId
 from pymongo import MongoClient
 
+from src.backend.user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
+
+from src.utils.color_code import get_color_by_score
 from user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
 from utils.color_code import get_color_by_score
 
 client = MongoClient(settings.MONGO_DB_URI)
 db = client[settings.MONGO_DB_NAME]
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseNotFound, HttpResponseForbidden, JsonResponse, HttpResponse
-from django.contrib import messages
-from bson import ObjectId
+
 
 
 def delete_game(request, game_id):
