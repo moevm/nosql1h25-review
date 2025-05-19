@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}Game List{% endblock %}
+
+{% block content %}
+{% load querystring %}
+{% load utils %}
+{% load rating_tags %}
+
+<div class="container mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-4">All New Games by Release Date</h1>
+
+    <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Фильтры -->
+        <aside class="w-full lg:w-1/4">
+            <form method="get" id="filters-form">
+                <h2 class="text-lg font-bold mb-4">Filters</h2>
+
+                <div class="border-t border-gray-300 mt-4 pt-4"></div>
+
+                <!-- Platforms -->
+                <div id="platforms-filter" class="space-y-2">
+                    {% for platform in platforms|slice:":5" %}
+                        <label class="block text-sm">
+                            <input type="checkbox" name="platform" value="{{ platform }}"
+                                   {% if platform in selected_platforms %}checked{% endif %}>
+                            {{ platform }}
+                        </label>
+                    {% endfor %}
+
+                    <div id="platforms-extra" class="transition-all max-h-0 overflow-hidden duration-500 ease-in-out">
+                        {% for platform in platforms|slice:"5:" %}
+                            <label class="block text-sm mt-1">
+                            <input type="checkbox" name="platform" value="{{ platform }}"
+                                   {% if platform in selected_platforms %}checked{% endif %}>
+                            {{ platform }}
+                            </label>
+                        {% endfor %}
+                    </div>
+
+                    {% if platforms|length > 5 %}
+                        <button
+                            type="button"
+                            onclick="toggleSection('platforms-extra', this)"
+                            class="text-blue-600 text-sm hover:underline focus:outline-none"
+                        >
+                            Show more
+                        </button>
+                    {% endif %}
+                </div>
+
+                <!-- Разделитель -->
+                <div class="border-t border-gray-300 mt-4 pt-4"></div>
+
+                <!-- Genres -->
+                <div id="genres-filter" class="space-y-2">
+                    {% for genre in genres|slice:":5" %}
+                        <label class="block text-sm">
+                            <input type="checkbox" name="genre" value="{{ genre }}"
+                                   {% if genre in selected_genres %}checked{% endif %}>
+                            {{ genre }}
+                        </label>
+                    {% endfor %}
+
+                    <div id="genre-extra" class="transition-all max-h-0 overflow-hidden duration-500 ease-in-out">
+                        {% for genre in genres|slice:"5:" %}
+                            <label class="block text-sm mt-1">
+                                <input type="checkbox" name="genre" value="{{ genre }}"
+                                   {% if genre in selected_genres %}checked{% endif %}>
+                                {{ genre }}
+                            </label>
+                        {% endfor %}
+                    </div>
+
+                    {% if genres|length > 5 %}
+                        <button
+                            type="button"
+                            onclick="toggleSection('genre-extra', this)"
+                            class="text-blue-600 text-sm hover:underline focus:outline-none"
+                        >
+                            Show more
+                        </button>
+                    {% endif %}
+                </div>
+
+                <div class="border-t border-gray-300 mt-4 pt-4"></div>
+
+                <button type="submit" class="mt-2 px-4 py-2 bg-black text-white rounded">Apply Filters</button>
+            </form>
+        </aside>
+
+        <!-- Игры -->
+        <section class="w-full lg:w-3/4">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6">
+              <p class="text-sm text-gray-600 mb-2 md:mb-0">
+                Found {{ total_games }} games
+              </p>
+
+              <form method="get" class="flex items-center space-x-2">
+                <label for="sort_by" class="text-sm text-gray-700">Sort by:</label>
+                <select name="sort" id="sort_by" onchange="this.form.submit()" class="border rounded px-2 py-1 text-sm">
+                  <option value="releaseDate" {% if sort_by == "releaseDate" %}selected{% endif %}>Release Date</option>
+                  <option value="user_score" {% if sort_by == "user_score" %}selected{% endif %}>User Score</option>
+                  <option value="critic_score" {% if sort_by == "critic_score" %}selected{% endif %}>Critic Score</option>
+                </select>
+
+                <select name="order" id="order_by" onchange="this.form.submit()" class="border rounded px-2 py-1 text-sm">
+                  <option value="desc" {% if order == "desc" %}selected{% endif %}>Descending</option>
+                  <option value="asc" {% if order == "asc" %}selected{% endif %}>Ascending</option>
+                </select>
+              </form>
+            </div>
+
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for game in games %}
+                <a href="{% url 'games:game_detail' game|get_item:'_id' %}">
+                    <div class="border rounded-lg p-2 hover:shadow-md transition flex flex-row items-center h-32">
+                        <img src="{{ game.imageUrl|default:'https://via.placeholder.com/150x200' }}" alt="{{ game.name }}"
+                             class="w-20 h-28 object-cover rounded mr-4 flex-shrink-0">
+                        <div class="flex flex-col justify-center flex-1">
+                            <h2 class="text-sm font-semibold">{{ game.title }}</h2>
+                            <p class="text-xs text-gray-500">{{ game.releaseDate|date:"M d, Y" }}</p>
+                        <div class="flex items-center mb-1">
+                            <span class="text-xs mr-1">User Rating</span>
+                            <span class="inline-flex items-center justify-center font-semibold text-xs"
+                                  style="width: 2em; height: 2em; background-color: {{ game.stats.userReviews.avgRating|get_color }}; border-radius: 0.5em;">
+                                {{ game.stats.userReviews.avgRating|default:"N/A" }}
+                            </span>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-xs mr-1">Critic Rating</span>
+                            <span class="inline-flex items-center justify-center font-semibold text-xs"
+                                  style="width: 2em; height: 2em; background-color: {{ game.stats.criticReviews.avgRating|get_color }}; border-radius: 0.5em;">
+                                {{ game.stats.criticReviews.avgRating|default:"N/A" }}
+                            </span>
+                        </div>
+                        </div>
+                    </div>
+                </a>
+                {% empty %}
+                <p>No games found for the selected filters.</p>
+                {% endfor %}
+            </div>
+
+            <!-- Пагинация -->
+            {% if is_paginated %}
+            <div class="mt-6 flex justify-center items-center gap-2">
+                {% if page_obj.has_previous %}
+                <a href="?{% querystring request.GET 'page' page_obj.previous_page_number %}"
+                   class="px-3 py-1 border rounded">&larr;</a>
+                {% endif %}
+
+                <span class="px-3 py-1 font-semibold">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+                {% if page_obj.has_next %}
+                <a href="?{% querystring request.GET 'page' page_obj.next_page_number %}"
+                   class="px-3 py-1 border rounded">&rarr;</a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </section>
+    </div>
+</div>
+
+<script>
+function toggleSection(id, button) {
+    const section = document.getElementById(id);
+    const isCollapsed = section.classList.contains("max-h-0");
+
+    if (isCollapsed) {
+        section.classList.remove("max-h-0");
+        section.classList.add("max-h-[1000px]");
+        button.textContent = "Скрыть";
+    } else {
+        section.classList.remove("max-h-[1000px]");
+        section.classList.add("max-h-0");
+        button.textContent = "Показать больше";
+    }
+}
+
+  document.getElementById("sort_by").addEventListener("change", function () {
+    const url = new URL(window.location.href);
+    url.searchParams.set("sort", this.value);
+    window.location.href = url.toString();
+  });
+
+  document.getElementById("order_by").addEventListener("change", function () {
+    const url = new URL(window.location.href);
+    url.searchParams.set("order", this.value);
+    window.location.href = url.toString();
+  });
+</script>
+
+
+{% endblock %}

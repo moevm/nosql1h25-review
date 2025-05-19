@@ -12,5 +12,5 @@ mongorestore --host "$MONGO_DB_HOST" \
              /app/backup
 
 echo "Starting Django..."
-python src/backend/rotten_scores/manage.py migrate
-python src/backend/rotten_scores/manage.py runserver 0.0.0.0:8080
+python src/backend/manage.py migrate
+python src/backend/manage.py runserver 0.0.0.0:8080
