@@ -16,12 +16,11 @@ from pymongo import MongoClient
 from src.backend.user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
 
 from src.utils.color_code import get_color_by_score
-from user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
-from utils.color_code import get_color_by_score
+from src.backend.user_profile.forms import ChangePersonalDataForm, ChangePasswordForm
+from src.utils.color_code import get_color_by_score
 
 client = MongoClient(settings.MONGO_DB_URI)
 db = client[settings.MONGO_DB_NAME]
-
 
 
 def delete_game(request, game_id):
