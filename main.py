@@ -8,11 +8,11 @@ def export_data():
 
 def import_data():
     mongo_io_manager = MongoImporter("game_reviews_db")
-    mongo_io_manager.import_data('backup')
+    mongo_io_manager.import_data('backup/game_reviews_db', drop=True)
 
 
 def main():
-    export_data()
+    import_data()
 
 
 if __name__ == '__main__':
