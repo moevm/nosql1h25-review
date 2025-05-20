@@ -1,1 +1,1 @@
-{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"354fb70b4fef422e834c72ffde503070","collectionName":"critic_reviews","type":"collection"}
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"f7def8c95831476ba03273dc999955b7","collectionName":"critic_reviews","type":"collection"}

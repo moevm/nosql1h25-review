@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}{{ game.title }} | Game Detail{% endblock %}
+{% load rating_tags %}
 
 
 {% block content %}
@@ -57,7 +58,10 @@
                 <div class="card p-4 mb-4" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 500px; margin: 40px auto 0;">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="mb-0" style="font-weight: bold;">Reviews</h4>
-                        <a class="text-decoration-none text-muted" style="font-size: 0.9rem;">See all</a>
+                        <a class="text-decoration-underline text-muted" style="font-size: 0.9rem;"
+                           href="{% url 'reviews:review_list' game.id %}">
+                            See all
+                        </a>
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center">
@@ -86,90 +90,105 @@
             {% endif %}
 
 
+            <!-- CRITIC REVIEWS -->
             {% if critic_reviews.0 %}
-              <div class="row mt-5">
-                  <div class="col-12">
-                    <h4 class="fw-bold">CRITIC REVIEWS</h4>
-                  </div>
+              <div class="mt-5">
+                <h4 class="fw-bold mb-3">CRITIC REVIEWS</h4>
+                <div class="flex gap-4">
                   {% for review in critic_reviews %}
-                  <div class="col-md-4 mb-3">
-                    <div class="border p-3 rounded h-100">
-                      <div class="d-flex align-items-center mb-2">
-                            <span style="background-color: {{ review.score_color }}; color: black; font-weight: bold; padding: 0.3rem 0.8rem; border-radius: 6px; margin-right: 10px;">
-                                {{ review.rating }}
-                            </span>
-                            <strong>{{ review.publication }}</strong>
+                    {% with color=review.rating|get_critic_color %}
+                    <div class="bg-white shadow rounded-lg p-4 flex gap-4 w-1/3">
+                      <div class="text-black font-bold text-xl w-12 h-12 flex items-center justify-center rounded"
+                           style="background-color: {{ color }}">
+                        {{ review.rating }}
                       </div>
-                      <p class="mb-2">{{ review.text|truncatechars:100 }}</p>
-                      <div class="d-flex justify-content-between">
-                        <a href="{{ review.fullReviewLink }}" target="_blank" class="small text-decoration-underline">FULL REVIEW</a>
-                        <button type="button" class="btn btn-dark btn-sm read-more-critic-btn"
-                                data-bs-toggle="modal" data-bs-target="#criticReviewModal"
-                                data-publication="{{ review.publication }}"
-                                data-rating="{{ review.rating }}"
-                                data-text="{{ review.text }}"
-                                data-createdat="{{ review.createdAt }}"
-                                data-platforms="{{ review.platforms|join:', ' }}"
-                                data-color="{{ review.score_color }}">
-                            Read more
-                        </button>
-                      </div>
-                      <div class="d-flex justify-content-between align-items-center mt-2 small">
-                        <span class="text-muted">{{ review.createdAt }}</span>
-                        <span class="fw-bold">{{ review.platforms.0 }}</span>
+                      <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                          <div class="flex justify-between items-center mb-1">
+                            <span class="font-semibold">{{ review.publication }}</span>
+                            <span class="text-sm text-gray-500">{{ review.createdAt }}</span>
+                          </div>
+                          <p class="text-sm text-gray-800 mb-2">{{ review.text|truncatechars:100 }}</p>
+                          {% if review.text|length > 100 %}
+                            <button type="button" class="btn btn-dark btn-sm mt-1 read-more-critic-btn"
+                                    data-bs-toggle="modal" data-bs-target="#criticReviewModal"
+                                    data-publication="{{ review.publication }}"
+                                    data-rating="{{ review.rating }}"
+                                    data-text="{{ review.text }}"
+                                    data-createdat="{{ review.createdAt }}"
+                                    data-platform="{{ review.platform }}"
+                                    data-color="{{ color }}">
+                              Read more
+                            </button>
+                          {% endif %}
+                        </div>
+                        <div class="flex justify-between items-center mt-2 text-sm">
+                          {% if review.fullReviewLink %}
+                            <a href="{{ review.fullReviewLink }}" target="_blank"
+                               class="text-gray-500 hover:text-gray-700 underline mt-2 text-sm inline-flex items-center">
+                              Full Review
+                            </a>
+                          {% endif %}
+                          <span class="font-bold">{{ review.platform }}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                    {% endwith %}
                   {% endfor %}
+                </div>
               </div>
             {% elif is_released %}
-                <div class="col-12">
-                    <div class="text-center text-muted mt-5 mb-5">
-                      <i>There are no critic reviews yet :(</i>
-                    </div>
-                </div>
+              <div class="text-center text-muted mt-5 mb-5">
+                <i>There are no critic reviews yet :(</i>
+              </div>
             {% endif %}
 
+            <!-- USER REVIEWS -->
             {% if user_reviews.0 %}
-          <div class="row mt-5">
-              <div class="col-12">
-                <h4 class="fw-bold">USER REVIEWS</h4>
-              </div>
-              {% for review in user_reviews %}
-              <div class="col-md-4 mb-3">
-                <div class="border p-3 rounded h-100">
-                  <div class="d-flex align-items-center mb-2">
-                        <span style="background-color: {{ review.score_color }}; color: black; font-weight: bold; padding: 0.3rem 0.8rem; border-radius: 6px; margin-right: 10px;">
-                            {{ review.rating }}
-                        </span>
-                        <strong>{{ review.username }}</strong>
-                  </div>
-                  <p class="mb-2">{{ review.text|truncatechars:100 }}</p>
-                    <button type="button" class="btn btn-dark btn-sm read-more-btn"
-                            data-bs-toggle="modal" data-bs-target="#reviewModal"
-                            data-username="{{ review.username }}"
-                            data-rating="{{ review.rating }}"
-                            data-text="{{ review.text }}"
-                            data-createdat="{{ review.createdAt }}"
-                            data-platform="{{ review.platform }}"
-                            data-color="{{ review.score_color }}">
-                        Read more
-                    </button>
-                  <div class="d-flex justify-content-between align-items-center mt-2 small">
-                    <span class="text-muted">{{ review.createdAt }}</span>
-                    <span class="fw-bold">{{ review.platform }}</span>
-                  </div>
+              <div class="mt-5">
+                <h4 class="fw-bold mb-3">USER REVIEWS</h4>
+                <div class="flex gap-4">
+                  {% for review in user_reviews %}
+                    {% with color=review.rating|get_user_color %}
+                    <div class="bg-white shadow rounded-lg p-4 flex gap-4 w-1/3">
+                      <div class="text-black font-bold text-xl w-12 h-12 flex items-center justify-center rounded"
+                           style="background-color: {{ color }}">
+                        {{ review.rating }}
+                      </div>
+                      <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                          <div class="flex justify-between items-center mb-1">
+                            <span class="font-semibold">{{ review.username }}</span>
+                            <span class="text-sm text-gray-500">{{ review.createdAt }}</span>
+                          </div>
+                          <p class="text-sm text-gray-800 mb-2">{{ review.text|truncatechars:100 }}</p>
+                          {% if review.text|length > 100 %}
+                            <button type="button" class="btn btn-dark btn-sm mt-1 read-more-btn"
+                                    data-bs-toggle="modal" data-bs-target="#reviewModal"
+                                    data-username="{{ review.username }}"
+                                    data-rating="{{ review.rating }}"
+                                    data-text="{{ review.text }}"
+                                    data-createdat="{{ review.createdAt }}"
+                                    data-platform="{{ review.platform }}"
+                                    data-color="{{ color }}">
+                              Read more
+                            </button>
+                          {% endif %}
+                        </div>
+                        <div class="flex justify-end items-center mt-2 text-sm">
+                          <span class="font-bold">{{ review.platform }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    {% endwith %}
+                  {% endfor %}
                 </div>
               </div>
-              {% endfor %}
-        {% elif is_released %}
-            <div class="col-12">
-                <div class="text-center text-muted mt-5 mb-5">
-                  <i>There are no user reviews yet :(</i>
-                </div>
-            </div>
-        {% endif %}
-            </div>
+            {% elif is_released %}
+              <div class="text-center text-muted mt-5 mb-5">
+                <i>There are no user reviews yet :(</i>
+              </div>
+            {% endif %}
         </div>
     </div>
   </div>
@@ -325,9 +344,6 @@
       </div>
     </div>
   </div>
-            </div>
-          </div>
-</div>
 
   <!-- Скрипт для подсчета символов, обработки рейтинга и сброса формы -->
   <script>
@@ -409,7 +425,7 @@
             document.getElementById('modalText').textContent = text;
             document.getElementById('modalCreatedAt').textContent = createdAt;
             document.getElementById('modalPlatform').textContent = platform;
-        });
+        });May 14, 2025, 1:54 a.m.
     });
 
 

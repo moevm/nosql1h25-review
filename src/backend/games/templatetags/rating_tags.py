@@ -6,20 +6,45 @@ register = template.Library()
 
 
 @register.filter
-def get_color(score: int | float) -> str:
+def get_user_color(score: int | float) -> str:
     """
     Returns a color code based on the score.
     :param score: The score to evaluate.
     :return: A string representing the color code.
     """
-    return get_color_by_score(score).color
+    return get_color_by_score(score, "user").color
 
 
 @register.filter
-def get_message(score: int | float) -> str:
+def get_critic_color(score: int | float) -> str:
+    """
+    Returns a color code based on the score.
+    :param score: The score to evaluate.
+    :return: A string representing the color code.
+    """
+    return get_color_by_score(score, "critic").color
+
+
+@register.filter
+def get_user_message(score: int | float) -> str:
     """
     Returns a message based on the score.
     :param score: The score to evaluate.
     :return: A string representing the message.
     """
-    return get_color_by_score(score).message
+    return get_color_by_score(score, "user").message
+
+
+@register.filter
+def get_critic_message(score: int | float) -> str:
+    """
+    Returns a message based on the score.
+    :param score: The score to evaluate.
+    :return: A string representing the message.
+    """
+    return get_color_by_score(score, "critic").message
+
+
+@register.filter
+def longer_than(value: str, arg: int):
+    return len(value) > int(arg)

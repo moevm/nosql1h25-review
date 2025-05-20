@@ -88,7 +88,7 @@ class HomepageView(TemplateView):
                 game['avg_rating_display'] = 0
 
             if 'avg_rating' in game:
-                color_code = get_color_by_score(game['avg_rating'])
+                color_code = get_color_by_score(game['avg_rating'], "critic")
                 game['avg_rating_color'] = color_code.color
                 game['avg_rating_message'] = color_code.message
 
