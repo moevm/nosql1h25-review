@@ -124,14 +124,14 @@
                         <div class="flex items-center mb-1">
                             <span class="text-xs mr-1">User Rating</span>
                             <span class="inline-flex items-center justify-center font-semibold text-xs"
-                                  style="width: 2em; height: 2em; background-color: {{ game.stats.userReviews.avgRating|get_color }}; border-radius: 0.5em;">
+                                  style="width: 2em; height: 2em; background-color: {{ game.stats.userReviews.avgRating|get_user_color }}; border-radius: 0.5em;">
                                 {{ game.stats.userReviews.avgRating|default:"N/A" }}
                             </span>
                         </div>
                         <div class="flex items-center">
                             <span class="text-xs mr-1">Critic Rating</span>
                             <span class="inline-flex items-center justify-center font-semibold text-xs"
-                                  style="width: 2em; height: 2em; background-color: {{ game.stats.criticReviews.avgRating|get_color }}; border-radius: 0.5em;">
+                                  style="width: 2em; height: 2em; background-color: {{ game.stats.criticReviews.avgRating|get_critic_color }}; border-radius: 0.5em;">
                                 {{ game.stats.criticReviews.avgRating|default:"N/A" }}
                             </span>
                         </div>
