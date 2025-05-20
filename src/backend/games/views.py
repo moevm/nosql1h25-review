@@ -145,14 +145,14 @@ def game_detail(request, pk):
         critic_reviews = game["recentCriticReviews"]
         for review in critic_reviews:
             score = review["rating"]
-            review["score_color"] = get_color_by_score(int(score)).color
+            review["score_color"] = get_color_by_score(score, "critic").color
 
     if "recentUserReviews" in game:
         user_reviews = game["recentUserReviews"]
         for review in user_reviews:
             user = db.users.find_one({"_id": review["userId"]})
             review["username"] = user["username"]
-            review["score_color"] = get_color_by_score(float(review["rating"])).color
+            review["score_color"] = get_color_by_score(review["rating"], "user").color
             # Добавляем platform, если его нет
             review["platform"] = review.get("platform", "Unknown")
             # Преобразуем дату в строку, если нужно
@@ -186,8 +186,8 @@ def game_detail(request, pk):
     average_score_message = None
     if "stats" in game and "criticReviews" in game["stats"]:
         average_score = game["stats"]["criticReviews"]["avgRating"]
-        average_score_color = get_color_by_score(int(average_score)).color
-        average_score_message = get_color_by_score(int(average_score)).message
+        average_score_color = get_color_by_score(average_score, "critic").color
+        average_score_message = get_color_by_score(average_score, "critic").message
 
     context = {
         "game": game,

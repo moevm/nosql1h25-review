@@ -158,7 +158,7 @@ def my_ratings_and_reviews(request):
 
     reviews = list(db.user_reviews.aggregate(data))
     for review in reviews:
-        review['color'] = get_color_by_score(float(review['rating'])).color
+        review['color'] = get_color_by_score(review['rating'], "user").color
         review['review_id'] = str(review['_id'])
 
     context = {

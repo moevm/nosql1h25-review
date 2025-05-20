@@ -1,7 +1,7 @@
-from typing import NamedTuple
+from typing import NamedTuple, Literal
 
-GREEN = "#28a745"
-YELLOW = "#ffc107"
+GREEN = "#00ce7a"
+YELLOW = "#ffbd3f"
 RED = "#dc3545"
 NO_SCORE = "#6c757d"
 
@@ -14,17 +14,18 @@ class ColorCode(NamedTuple):
     message: str
 
 
-def get_color_by_score(score: int | float) -> ColorCode:
+def get_color_by_score(score: int | float, score_type: Literal["user", "critic"]) -> ColorCode:
     """
     Returns a color code based on the score.
+    :param score_type: The type of score, either “user” or “critic”.
     :param score: The score to evaluate.
     :return: A string representing the color code.
     """
     if score is None or score == '':
         return ColorCode(NO_SCORE, "No score available")
-    if isinstance(score, float):
+    if score_type == "user":
         return _get_color_by_user_score(score)
-    elif isinstance(score, int):
+    elif score_type == "critic":
         return _get_color_by_critic_score(score)
     raise ValueError(f"Score must be an integer for critic score or a float for user score. Got {type(score)}.")
 
