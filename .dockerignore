@@ -5,3 +5,5 @@ nosql_model
 sql_model
 README.md
 ui_mockup.png
+report.*
+Dockerfile

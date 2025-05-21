@@ -17,7 +17,7 @@ EXPOSE 8000
 
 COPY . /app
 
-RUN mkdir -p /app/backend/rotten_scores/static_dev /app/backend/rotten_scores/templates
+RUN mkdir -p /app/backend/static_dev /app/backend/templates
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

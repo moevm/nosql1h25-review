@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-v^9t_ln%8bcfo+k^6#$w)+$ayg$z58b-)bsv8&%v2bf0b$vc^7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -107,10 +107,10 @@ DATABASES = {
         'NAME': MONGO_DB_NAME,
         'CLIENT': {
             'host': MONGO_DB_URI,
-            # 'username': MONGO_DB_USER,
-            # 'password': MONGO_DB_PASSWORD,
-            # 'authSource': 'admin',
-            # 'authMechanism': 'SCRAM-SHA-1',
+            'username': MONGO_DB_USER,
+            'password': MONGO_DB_PASSWORD,
+            'authSource': 'admin',
+            'authMechanism': 'SCRAM-SHA-1',
         }
     }
 }
